@@ -15,7 +15,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 @Configuration
 @EnableMongoAuditing
-@EnableMongoRepositories(basePackages = "com.erebelo.springloomdemo")
+@EnableMongoRepositories(basePackages = "com.erebelo.springstrategydemo")
 public class MongoBeanConfig {
 
     /**

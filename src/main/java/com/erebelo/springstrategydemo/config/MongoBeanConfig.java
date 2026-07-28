@@ -22,7 +22,7 @@ public class MongoBeanConfig {
      * Enables transaction management for MongoDB operations through @Transactional.
      */
     @Bean
-    public MongoTransactionManager transactionManager(MongoDatabaseFactory dbFactory) {
+    MongoTransactionManager transactionManager(MongoDatabaseFactory dbFactory) {
         return new MongoTransactionManager(dbFactory);
     }
 
@@ -31,7 +31,7 @@ public class MongoBeanConfig {
      * the BaseEntity.
      */
     @Bean
-    public AuditorAware<@NonNull String> auditorProvider() {
+    AuditorAware<@NonNull String> auditorProvider() {
         return () -> Optional.of("default");
     }
 
@@ -40,7 +40,7 @@ public class MongoBeanConfig {
      * LocalDate values.
      */
     @Bean
-    public MongoCustomConversions customConversions() {
+    MongoCustomConversions customConversions() {
         return MongoCustomConversions.create(adapter -> {
             adapter.registerConverter(new LocalDateWritingConverter());
             adapter.registerConverter(new LocalDateReadingConverter());

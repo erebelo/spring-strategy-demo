@@ -1,9 +1,9 @@
-package com.erebelo.springstrategydemo.model.entity.relationship.nova.selling;
+package com.erebelo.springstrategydemo.model.entity.relationship.nova;
 
 import com.erebelo.springstrategydemo.model.entity.relationship.RelationshipProperties;
-import com.erebelo.springstrategydemo.model.entity.relationship.nova.enumeration.NovaRelationshipLabelEnum;
-import com.erebelo.springstrategydemo.model.entity.relationship.nova.enumeration.NovaRelationshipStatusEnum;
-import com.erebelo.springstrategydemo.model.entity.relationship.nova.selling.enumeration.NovaSellingRelationshipTypeEnum;
+import com.erebelo.springstrategydemo.model.enums.relationship.nova.NovaRelationshipLabel;
+import com.erebelo.springstrategydemo.model.enums.relationship.nova.NovaRelationshipStatus;
+import com.erebelo.springstrategydemo.model.enums.relationship.nova.NovaSellingRelationshipType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotNull;
@@ -23,12 +23,12 @@ import lombok.experimental.SuperBuilder;
 public class NovaSellingRelationshipProperties extends RelationshipProperties {
 
     @NotNull
-    private NovaRelationshipStatusEnum relationshipStatus;
+    private NovaRelationshipStatus relationshipStatus;
 
     @NotNull
-    private NovaSellingRelationshipTypeEnum relationshipType;
+    private NovaSellingRelationshipType relationshipType;
 
     @NotNull
-    private NovaRelationshipLabelEnum relationshipLabel;
+    private NovaRelationshipLabel relationshipLabel;
 
 }

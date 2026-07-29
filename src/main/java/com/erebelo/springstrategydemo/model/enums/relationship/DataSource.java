@@ -1,4 +1,4 @@
-package com.erebelo.springstrategydemo.model.entity.relationship.enumeratoin;
+package com.erebelo.springstrategydemo.model.enums.relationship;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Collections;
@@ -10,7 +10,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public enum DataSourceEnum {
+public enum DataSource {
 
     @JsonProperty("NOVA")
     NOVA_SELLING_RELATIONSHIP("NOVA Selling Relationship", "NOVA"),
@@ -21,17 +21,17 @@ public enum DataSourceEnum {
     private final String code;
     private final String value;
 
-    private static final Map<String, DataSourceEnum> ENUM_MAP = initMap();
+    private static final Map<String, DataSource> ENUM_MAP = initMap();
 
-    private static Map<String, DataSourceEnum> initMap() {
-        Map<String, DataSourceEnum> map = new HashMap<>();
-        for (DataSourceEnum instance : DataSourceEnum.values()) {
+    private static Map<String, DataSource> initMap() {
+        Map<String, DataSource> map = new HashMap<>();
+        for (DataSource instance : DataSource.values()) {
             map.put(instance.getCode(), instance);
         }
         return Collections.unmodifiableMap(map);
     }
 
-    public static DataSourceEnum fromCode(String code) {
+    public static DataSource fromCode(String code) {
         return ENUM_MAP.get(code);
     }
 

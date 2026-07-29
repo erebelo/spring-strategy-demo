@@ -1,6 +1,6 @@
 package com.erebelo.springstrategydemo.model.dto.relationship.response;
 
-import com.erebelo.springstrategydemo.model.dto.relationship.enumeration.RelationshipNodeTypeDtoEnum;
+import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipNodeType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.Map;
@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RelationshipNodeResponse {
 
-    private RelationshipNodeTypeDtoEnum type;
+    private RelationshipNodeType type;
     private String identifier;
     private Map<String, String> properties;
 

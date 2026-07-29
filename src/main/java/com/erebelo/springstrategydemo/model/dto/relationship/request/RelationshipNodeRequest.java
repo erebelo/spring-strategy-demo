@@ -1,6 +1,6 @@
 package com.erebelo.springstrategydemo.model.dto.relationship.request;
 
-import com.erebelo.springstrategydemo.model.dto.relationship.enumeration.RelationshipNodeTypeDtoEnum;
+import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipNodeType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotBlank;
@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 public class RelationshipNodeRequest {
 
     @NotNull
-    private RelationshipNodeTypeDtoEnum type;
+    private RelationshipNodeType type;
 
     @NotBlank
     private String identifier;

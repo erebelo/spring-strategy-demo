@@ -1,7 +1,7 @@
-package com.erebelo.springstrategydemo.model.dto.relationship.nova.nonselling.request;
+package com.erebelo.springstrategydemo.model.dto.relationship.nova;
 
-import com.erebelo.springstrategydemo.model.dto.relationship.nova.enumeration.NovaRelationshipStatusDtoEnum;
-import com.erebelo.springstrategydemo.model.dto.relationship.nova.nonselling.enumeration.NovaNonSellingRelationshipTypeDtoEnum;
+import com.erebelo.springstrategydemo.model.enums.relationship.nova.NovaNonSellingRelationshipType;
+import com.erebelo.springstrategydemo.model.enums.relationship.nova.NovaRelationshipStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotNull;
@@ -19,9 +19,9 @@ import lombok.NoArgsConstructor;
 public class NovaNonSellingRelationshipPropertiesRequest {
 
     @NotNull
-    private NovaRelationshipStatusDtoEnum relationshipStatus;
+    private NovaRelationshipStatus relationshipStatus;
 
     @NotNull
-    private NovaNonSellingRelationshipTypeDtoEnum relationshipType;
+    private NovaNonSellingRelationshipType relationshipType;
 
 }

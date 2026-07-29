@@ -1,6 +1,6 @@
-package com.erebelo.springstrategydemo.model.dto.relationship.nova.selling.enumeration;
+package com.erebelo.springstrategydemo.model.enums.relationship.nova;
 
-public enum NovaSellingRelationshipTypeDtoEnum {
+public enum NovaSellingRelationshipType {
 
     ADVISOR_TO_AGENT, AGENT_TO_INSURER, INDIVIDUAL_TO_POLICY_HOLDER, INDIVIDUAL_TO_DEPENDENT, INDIVIDUAL_TO_BENEFICIARY, INDIVIDUAL_TO_SUB_AGENT, SUB_AGENT_TO_REGIONAL_MANAGER, REGIONAL_MANAGER_TO_AGENCY, AGENCY_TO_INSURER
 

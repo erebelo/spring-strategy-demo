@@ -19,21 +19,21 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleBadRequestException(BadRequestException exception) {
+    ErrorResponse handleBadRequestException(BadRequestException exception) {
         log.error("Request failed.", exception);
         return createResponse(HttpStatus.BAD_REQUEST, exception);
     }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNotFoundException(NotFoundException exception) {
+    ErrorResponse handleNotFoundException(NotFoundException exception) {
         log.error("Resource not found.", exception);
         return createResponse(HttpStatus.NOT_FOUND, exception);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleConstraintViolationException(ConstraintViolationException exception) {
+    ErrorResponse handleConstraintViolationException(ConstraintViolationException exception) {
         log.error("Validation failed.", exception);
 
         String message = exception.getConstraintViolations().stream()
@@ -45,14 +45,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ConflictException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleConflictException(ConflictException exception) {
+    ErrorResponse handleConflictException(ConflictException exception) {
         log.error("Request conflict.", exception);
         return createResponse(HttpStatus.CONFLICT, exception);
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleUnexpectedException(Exception exception) {
+    ErrorResponse handleUnexpectedException(Exception exception) {
         log.error("Unexpected error occurred.", exception);
         return createResponse(HttpStatus.INTERNAL_SERVER_ERROR, exception);
     }

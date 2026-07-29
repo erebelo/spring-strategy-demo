@@ -7,7 +7,7 @@ import lombok.experimental.UtilityClass;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 @UtilityClass
-public class AdapterUtil {
+public class AdapterUtils {
 
     /**
      * Adds a criteria condition only if the supplied value is present (not null).

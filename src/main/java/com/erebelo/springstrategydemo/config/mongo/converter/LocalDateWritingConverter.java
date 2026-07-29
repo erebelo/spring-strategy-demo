@@ -1,4 +1,4 @@
-package com.erebelo.springstrategydemo.converter;
+package com.erebelo.springstrategydemo.config.mongo.converter;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;

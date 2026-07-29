@@ -1,7 +1,7 @@
-package com.erebelo.springstrategydemo.config;
+package com.erebelo.springstrategydemo.config.mongo;
 
-import com.erebelo.springstrategydemo.converter.LocalDateReadingConverter;
-import com.erebelo.springstrategydemo.converter.LocalDateWritingConverter;
+import com.erebelo.springstrategydemo.config.mongo.converter.LocalDateReadingConverter;
+import com.erebelo.springstrategydemo.config.mongo.converter.LocalDateWritingConverter;
 import java.util.Optional;
 import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @Configuration
 @EnableMongoAuditing
 @EnableMongoRepositories(basePackages = "com.erebelo.springstrategydemo")
-public class MongoBeanConfig {
+public class MongoConfig {
 
     /**
      * Enables transaction management for MongoDB operations through @Transactional.

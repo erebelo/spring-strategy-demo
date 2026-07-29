@@ -1,4 +1,4 @@
-package com.erebelo.springstrategydemo.config;
+package com.erebelo.springstrategydemo.config.mongo;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;

@@ -29,7 +29,7 @@ import tools.jackson.databind.node.ObjectNode;
  */
 @Component
 @RequiredArgsConstructor
-public class DeepComparator {
+public class DeepObjectComparator {
 
     private final ObjectMapper mapper;
 

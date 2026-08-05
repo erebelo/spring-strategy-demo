@@ -1,6 +1,6 @@
 package com.erebelo.springstrategydemo.model.entity.relationship;
 
-import com.erebelo.springstrategydemo.model.enums.relationship.DataSource;
+import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipDataSource;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotNull;
@@ -21,6 +21,6 @@ import lombok.experimental.SuperBuilder;
 public abstract class RelationshipProperties {
 
     @NotNull
-    private DataSource dataSource;
+    private RelationshipDataSource relationshipDataSource;
 
 }

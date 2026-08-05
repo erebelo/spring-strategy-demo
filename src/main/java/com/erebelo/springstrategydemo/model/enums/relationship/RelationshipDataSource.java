@@ -10,7 +10,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public enum DataSource {
+public enum RelationshipDataSource {
 
     @JsonProperty("NOVA")
     NOVA_SELLING_RELATIONSHIP("NOVA Selling Relationship", "NOVA"),
@@ -21,17 +21,17 @@ public enum DataSource {
     private final String code;
     private final String value;
 
-    private static final Map<String, DataSource> ENUM_MAP = initMap();
+    private static final Map<String, RelationshipDataSource> ENUM_MAP = initMap();
 
-    private static Map<String, DataSource> initMap() {
-        Map<String, DataSource> map = new HashMap<>();
-        for (DataSource instance : DataSource.values()) {
+    private static Map<String, RelationshipDataSource> initMap() {
+        Map<String, RelationshipDataSource> map = new HashMap<>();
+        for (RelationshipDataSource instance : RelationshipDataSource.values()) {
             map.put(instance.getCode(), instance);
         }
         return Collections.unmodifiableMap(map);
     }
 
-    public static DataSource fromCode(String code) {
+    public static RelationshipDataSource fromCode(String code) {
         return ENUM_MAP.get(code);
     }
 

@@ -7,13 +7,22 @@ import com.erebelo.springstrategydemo.model.dto.relationship.request.search.Rela
 import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipDataSource;
 import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipNodeType;
 import com.erebelo.springstrategydemo.util.AdapterUtils;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validator;
 import java.util.Set;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 public abstract class AbstractRelationshipAdapter implements RelationshipAdapter {
 
-    @Override
-    public <P> Criteria defaultUpsertCriteria(RelationshipDataSource adapterName, RelationshipRequest<P> request) {
+    private final Validator validator;
+
+    protected AbstractRelationshipAdapter(Validator validator) {
+        this.validator = validator;
+    }
+
+    public final <P> Criteria defaultUpsertCriteria(RelationshipDataSource adapterName,
+            RelationshipRequest<P> request) {
         Criteria criteria = new Criteria();
 
         criteria.and("from.type").is(request.getFrom().getType());
@@ -26,20 +35,19 @@ public abstract class AbstractRelationshipAdapter implements RelationshipAdapter
         return criteria;
     }
 
-    @Override
-    public <P> Criteria defaultSearchCriteria(RelationshipDataSource adapterName,
+    public final <P> Criteria defaultSearchCriteria(RelationshipDataSource adapterName,
             RelationshipSearchRequest<P> request) {
         Criteria criteria = new Criteria();
 
         AdapterUtils.addIfPresent(criteria, "startDate", request::getStartDate);
         AdapterUtils.addIfPresent(criteria, "endDate", request::getEndDate);
+
         criteria.and("properties.relationshipDataSource").is(adapterName);
 
         return criteria;
     }
 
-    @Override
-    public <P> Criteria defaultExpireCriteria(RelationshipDataSource adapterName,
+    public final <P> Criteria defaultExpireCriteria(RelationshipDataSource adapterName,
             RelationshipExpireRequest<P> request) {
         Criteria criteria = new Criteria();
 
@@ -53,8 +61,7 @@ public abstract class AbstractRelationshipAdapter implements RelationshipAdapter
         return criteria;
     }
 
-    @Override
-    public Criteria defaultExpireByIdCriteria(RelationshipDataSource adapterName, String id) {
+    public final Criteria defaultExpireByIdCriteria(RelationshipDataSource adapterName, String id) {
         Criteria criteria = new Criteria();
 
         criteria.and("_id").is(id);
@@ -74,6 +81,14 @@ public abstract class AbstractRelationshipAdapter implements RelationshipAdapter
             String nodeTypeName = isFromNode ? "from.type" : "to.type";
             throw new BadRequestException(
                     "Invalid %s=%s. Accepted type(s): %s".formatted(nodeTypeName, nodeType, validTypes));
+        }
+    }
+
+    protected final <T> void validatePropertiesRequest(T properties) {
+        Set<ConstraintViolation<T>> violations = validator.validate(properties);
+
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
         }
     }
 }

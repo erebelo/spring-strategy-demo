@@ -4,8 +4,6 @@ import com.erebelo.springstrategydemo.exception.model.NotFoundException;
 import com.erebelo.springstrategydemo.mapper.RelationshipMapper;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.RelationshipRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.expire.RelationshipExpireRequest;
-import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipSearchRequest;
-import com.erebelo.springstrategydemo.model.dto.relationship.response.RelationshipNodeResponse;
 import com.erebelo.springstrategydemo.model.dto.relationship.response.RelationshipResponse;
 import com.erebelo.springstrategydemo.model.entity.relationship.Relationship;
 import com.erebelo.springstrategydemo.model.entity.relationship.RelationshipNode;
@@ -15,6 +13,13 @@ import com.erebelo.springstrategydemo.repository.MongoRepository;
 import com.erebelo.springstrategydemo.service.RelationshipService;
 import com.erebelo.springstrategydemo.service.adapter.RelationshipAdapter;
 import com.erebelo.springstrategydemo.support.DeepObjectComparator;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -22,16 +27,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NonNull;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Service
@@ -64,9 +59,8 @@ public class RelationshipServiceImpl implements RelationshipService {
 
         RelationshipAdapter adapter = getAdapter(adapterName);
 
-        ResolvedNode resolvedFrom = adapter.resolveFromNode(request.getFrom());
-        ResolvedNode resolvedTo = adapter.resolveToNode(request.getTo());
-
+        RelationshipNode fromNode = adapter.resolveFromNode(request.getFrom());
+        RelationshipNode toNode = adapter.resolveToNode(request.getTo());
         RelationshipProperties properties = adapter.resolveRelationshipProperties(request.getProperties());
         properties.setRelationshipDataSource(adapterName);
 
@@ -84,8 +78,8 @@ public class RelationshipServiceImpl implements RelationshipService {
             JsonNode originalRelationship = deepObjectComparator.toTypedTree(existingRelationship);
 
             relationship = existingRelationship;
-            relationship.setFrom(resolvedFrom.node());
-            relationship.setTo(resolvedTo.node());
+            relationship.setFrom(fromNode);
+            relationship.setTo(toNode);
             relationship.setProperties(properties);
             relationship.setStartDate(request.getStartDate());
             relationship.setEndDate(request.getEndDate());
@@ -101,7 +95,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         } else {
             log.info("[{}] No existing relationship found, creating new one", adapterName);
 
-            relationship = Relationship.builder().from(resolvedFrom.node()).to(resolvedTo.node()).properties(properties)
+            relationship = Relationship.builder().from(fromNode).to(toNode).properties(properties)
                     .startDate(request.getStartDate()).endDate(request.getEndDate()).build();
 
             mongoRepository.insert(relationship);
@@ -109,7 +103,7 @@ public class RelationshipServiceImpl implements RelationshipService {
             log.info("[{}] Successfully inserted relationship with ID={}", adapterName, relationship.getId());
         }
 
-        return toEnrichedResponse(relationship, resolvedFrom.summary(), resolvedTo.summary());
+        return relationshipMapper.toRelationshipResponse(relationship, objectMapper);
     }
 
     @Transactional
@@ -135,13 +129,9 @@ public class RelationshipServiceImpl implements RelationshipService {
 
         mongoRepository.save(relationship);
 
-        Map<String, NodeSummary> summaries = adapter.enrichNodes(List.of(relationship));
-        NodeSummary fromSummary = summaries.get(relationship.getFrom().getIdentifier());
-        NodeSummary toSummary = summaries.get(relationship.getTo().getIdentifier());
-
         log.info("[{}] Successfully expired relationship with ID={}", adapterName, relationship.getId());
 
-        return toEnrichedResponse(relationship, fromSummary, toSummary);
+        return relationshipMapper.toRelationshipResponse(relationship, objectMapper);
     }
 
     @Transactional
@@ -160,85 +150,85 @@ public class RelationshipServiceImpl implements RelationshipService {
         }
 
         adapter.resolveExpireRelationshipProperties(relationship.getProperties());
-
         relationship.setEndDate(LocalDate.now(ZoneOffset.UTC));
 
         mongoRepository.save(relationship);
 
-        Map<String, NodeSummary> summaries = adapter.enrichNodes(List.of(relationship));
-        NodeSummary fromSummary = summaries.get(relationship.getFrom().getIdentifier());
-        NodeSummary toSummary = summaries.get(relationship.getTo().getIdentifier());
-
+        adapter.enri
         log.info("[{}] Successfully expired relationship with ID={}", adapterName, relationship.getId());
 
-        return toEnrichedResponse(relationship, fromSummary, toSummary);
+        return relationshipMapper.toRelationshipResponse(relationship, objectMapper);
     }
 
-    @Transactional(readOnly = true)
-    public <P> PaginatedResponse<RelationshipResponse> searchRelationships(RelationshipDataSource adapterName,
-            RelationshipSearchRequest<P> request, PaginationRequestDto pagination) {
-        log.info("[{}] Fetching relationships with search criteria", adapterName);
-
-        RelationshipAdapter adapter = getAdapter(adapterName);
-
-        Criteria criteria = adapter.defaultSearchCriteria(adapterName, request);
-        adapter.buildSearchCriteria(request, criteria);
-
-        Pageable pageable = PaginationUtil.createPageable(pagination.getPage(), pagination.getPageSize(),
-                Sort.unsorted());
-
-        Page<@NonNull Relationship> relationshipPage = mongoRepository.findByCriteria(criteria, pageable,
-                Relationship.class);
-
-        log.info("[{}] Found {} relationships matching criteria", adapterName, relationshipPage.getTotalElements());
-
-        List<Relationship> relationships = relationshipPage.getContent();
-        Map<String, NodeSummary> summaries = adapter.enrichNodes(relationships);
-
-        return PaginatedResponse.fromPage(relationshipPage,
-                relationship -> enrichNodeProperties(
-                        relationshipMapper.toRelationshipResponse(relationship, objectMapper), relationship,
-                        summaries));
-    }
+//    @Transactional(readOnly = true)
+//    public <P> PaginatedResponse<RelationshipResponse> searchRelationships(RelationshipDataSource adapterName,
+//            RelationshipSearchRequest<P> request, PaginationRequestDto pagination) {
+//        log.info("[{}] Fetching relationships with search criteria", adapterName);
+//
+//        RelationshipAdapter adapter = getAdapter(adapterName);
+//
+//        Criteria criteria = adapter.defaultSearchCriteria(adapterName, request);
+//        adapter.buildSearchCriteria(request, criteria);
+//
+//        Pageable pageable = PaginationUtil.createPageable(pagination.getPage(), pagination.getPageSize(),
+//                Sort.unsorted());
+//
+//        Page<@NonNull Relationship> relationshipPage = mongoRepository.findByCriteria(criteria, pageable,
+//                Relationship.class);
+//
+//        log.info("[{}] Found {} relationships matching criteria", adapterName, relationshipPage.getTotalElements());
+//
+//        List<Relationship> relationships = relationshipPage.getContent();
+//        Map<String, NodeSummary> summaries = adapter.enrichNodes(relationships);
+//
+//        return PaginatedResponse.fromPage(relationshipPage,
+//                relationship -> enrichNodeProperties(
+//                        relationshipMapper.toRelationshipResponse(relationship, objectMapper), relationship,
+//                        summaries));
+//    }
 
     private RelationshipAdapter getAdapter(RelationshipDataSource adapterName) {
         return Optional.ofNullable(adapters.get(adapterName)).orElseThrow(() -> new IllegalArgumentException(
                 "Unknown adapter: %s. Available adapters: %s".formatted(adapterName, adapters.keySet())));
     }
 
-    private RelationshipResponse enrichNodeProperties(RelationshipResponse response, Relationship rel,
-            Map<String, NodeSummary> summaries) {
-        applyNodeSummary(response.getFrom(), rel.getFrom(), summaries);
-        applyNodeSummary(response.getTo(), rel.getTo(), summaries);
-
-        return response;
-    }
-
-    private void applyNodeSummary(RelationshipNodeResponse nodeResponse, RelationshipNode node,
-            Map<String, NodeSummary> summaries) {
-        if (nodeResponse == null || node == null) {
-            return;
-        }
-
-        NodeSummary summary = summaries.get(node.getIdentifier());
-
-        if (summary != null) {
-            nodeResponse.setProperties(summary.toProperties());
-        }
-    }
-
-    private RelationshipResponse toEnrichedResponse(Relationship relationship, NodeSummary fromSummary,
-            NodeSummary toSummary) {
-        RelationshipResponse response = relationshipMapper.toRelationshipResponse(relationship, objectMapper);
-
-        if (fromSummary != null) {
-            response.getFrom().setProperties(fromSummary.toProperties());
-        }
-
-        if (toSummary != null) {
-            response.getTo().setProperties(toSummary.toProperties());
-        }
-
-        return response;
-    }
+    // private RelationshipResponse enrichNodeProperties(RelationshipResponse
+    // response, Relationship rel,
+    // Map<String, NodeSummary> summaries) {
+    // applyNodeSummary(response.getFrom(), rel.getFrom(), summaries);
+    // applyNodeSummary(response.getTo(), rel.getTo(), summaries);
+    //
+    // return response;
+    // }
+    //
+    // private void applyNodeSummary(RelationshipNodeResponse nodeResponse,
+    // RelationshipNode node,
+    // Map<String, NodeSummary> summaries) {
+    // if (nodeResponse == null || node == null) {
+    // return;
+    // }
+    //
+    // NodeSummary summary = summaries.get(node.getIdentifier());
+    //
+    // if (summary != null) {
+    // nodeResponse.setProperties(summary.toProperties());
+    // }
+    // }
+    //
+    // private RelationshipResponse toEnrichedResponse(Relationship relationship,
+    // NodeSummary fromSummary,
+    // NodeSummary toSummary) {
+    // RelationshipResponse response =
+    // relationshipMapper.toRelationshipResponse(relationship, objectMapper);
+    //
+    // if (fromSummary != null) {
+    // response.getFrom().setProperties(fromSummary.toProperties());
+    // }
+    //
+    // if (toSummary != null) {
+    // response.getTo().setProperties(toSummary.toProperties());
+    // }
+    //
+    // return response;
+    // }
 }

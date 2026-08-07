@@ -16,15 +16,26 @@ import tools.jackson.databind.ObjectMapper;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface RelationshipMapper {
 
+    /*
+     * RelationshipResponse and RelationshipNodeResponse mappers starts here
+     */
+
     @Mapping(target = "properties", source = "properties", qualifiedByName = "mapProperties")
     RelationshipResponse toRelationshipResponse(Relationship relationship, @Context ObjectMapper objectMapper);
 
-    RelationshipNodeResponse toRelationshipNodeResponse(RelationshipNode relationshipNode,
-            @Context ObjectMapper objectMapper);
+    RelationshipNodeResponse toRelationshipNodeResponse(
+            RelationshipNode relationshipNode/*
+                                                 * ,
+                                                 * 
+                                                 * @Context ObjectMapper objectMapper
+                                                 */);
+
+    /*
+     * Properties mapper starts here
+     */
 
     @Named("mapProperties")
     default Map<String, Object> mapProperties(Object properties, @Context ObjectMapper objectMapper) {
-
         if (properties == null) {
             return null;
         }

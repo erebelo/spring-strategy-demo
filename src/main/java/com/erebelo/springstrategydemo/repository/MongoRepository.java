@@ -1,5 +1,6 @@
 package com.erebelo.springstrategydemo.repository;
 
+import java.util.Collection;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +58,39 @@ public class MongoRepository {
                 result != null ? "yes" : "no");
 
         return result;
+    }
+
+    /**
+     * Find all documents where the given field matches any of the provided values.
+     *
+     * @param fieldName
+     *            the field name to match
+     * @param values
+     *            the field values to match
+     * @param entityClass
+     *            the document class type
+     * @param includeFields
+     *            optional fields to include in the result
+     * @param <T>
+     *            the document type
+     * @return the matching documents, or an empty list if none are found
+     */
+    public <T> List<T> findAllByField(String fieldName, Collection<?> values, Class<T> entityClass,
+            String... includeFields) {
+
+        log.debug("Finding all {} by {} in {} with projections", entityClass.getSimpleName(), fieldName, values);
+
+        Query query = new Query(Criteria.where(fieldName).in(values));
+
+        for (String field : includeFields) {
+            query.fields().include(field);
+        }
+
+        List<T> results = mongoTemplate.find(query, entityClass);
+
+        log.debug("Found {} {}(s) for {} in {}", results.size(), entityClass.getSimpleName(), fieldName, values);
+
+        return results;
     }
 
     /**
@@ -158,8 +192,10 @@ public class MongoRepository {
     /**
      * Save or update a document.
      *
-     * @param document the document to save
-     * @param <T>      the document type
+     * @param document
+     *            the document to save
+     * @param <T>
+     *            the document type
      */
     public <T> void save(T document) {
         log.debug("Saving document of type: {}", document.getClass().getSimpleName());
@@ -173,8 +209,10 @@ public class MongoRepository {
     /**
      * Insert a new document.
      *
-     * @param document the document to insert
-     * @param <T>      the document type
+     * @param document
+     *            the document to insert
+     * @param <T>
+     *            the document type
      */
     public <T> void insert(T document) {
         log.debug("Inserting document of type: {}", document.getClass().getSimpleName());

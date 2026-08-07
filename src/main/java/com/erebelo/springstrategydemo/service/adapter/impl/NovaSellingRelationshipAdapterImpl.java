@@ -9,7 +9,9 @@ import com.erebelo.springstrategydemo.model.entity.contract.Contract;
 import com.erebelo.springstrategydemo.model.entity.relationship.Relationship;
 import com.erebelo.springstrategydemo.model.entity.relationship.RelationshipNode;
 import com.erebelo.springstrategydemo.model.entity.relationship.RelationshipProperties;
+import com.erebelo.springstrategydemo.model.entity.relationship.nova.NovaSellingRelationshipProperties;
 import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipDataSource;
+import com.erebelo.springstrategydemo.model.enums.relationship.nova.NovaRelationshipStatus;
 import com.erebelo.springstrategydemo.repository.MongoRepository;
 import com.erebelo.springstrategydemo.service.adapter.AbstractRelationshipAdapter;
 import jakarta.validation.Validator;
@@ -80,11 +82,19 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
     public <P> RelationshipProperties resolveRelationshipProperties(P properties) {
         log.debug("[{}] Resolving relationship properties", getAdapterName());
 
-        NovaSellingRelationshipPropertiesRequest novaRelProperties = (NovaSellingRelationshipPropertiesRequest) properties;
+        NovaSellingRelationshipPropertiesRequest novaRelPropertiesRequest = (NovaSellingRelationshipPropertiesRequest) properties;
 
-        validatePropertiesRequest(novaRelProperties);
+        validatePropertiesRequest(novaRelPropertiesRequest);
 
-        return novaRelationshipMapper.toNovaSellingRelationshipProperties(novaRelProperties);
+        return novaRelationshipMapper.toNovaSellingRelationshipProperties(novaRelPropertiesRequest);
+    }
+
+    @Override
+    public <P> void enrichRelationshipProperties(P properties) {
+        log.debug("[{}] Enriching relationship properties", getAdapterName());
+
+        NovaSellingRelationshipProperties novaRelProperties = (NovaSellingRelationshipProperties) properties;
+        novaRelProperties.setRelationshipStatus(NovaRelationshipStatus.EXPIRED);
     }
 
     @Override
@@ -104,9 +114,5 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
             relationship.setTo(relationshipMapper.enrichRelationshipNode(relationship.getTo(),
                     contractsByReferenceId.get(relationship.getTo().getIdentifier()), objectMapper));
         }
-    }
-
-    @Override
-    public <P> void resolveExpireRelationshipProperties(P properties) {
     }
 }

@@ -123,10 +123,11 @@ public class RelationshipServiceImpl implements RelationshipService {
                     "[%s] No relationship found to expire by matching criteria".formatted(adapterName));
         }
 
-        adapter.resolveExpireRelationshipProperties(relationship.getProperties());
+        adapter.enrichRelationshipProperties(relationship.getProperties());
         relationship.setEndDate(LocalDate.now(ZoneOffset.UTC));
 
         mongoRepository.save(relationship);
+        adapter.enrichNodes(List.of(relationship));
 
         log.info("[{}] Successfully expired relationship with ID={}", adapterName, relationship.getId());
 
@@ -148,14 +149,13 @@ public class RelationshipServiceImpl implements RelationshipService {
                     "[%s] No active relationship found with ID=%s".formatted(adapterName, relationshipId));
         }
 
-        adapter.resolveExpireRelationshipProperties(relationship.getProperties());
+        adapter.enrichRelationshipProperties(relationship.getProperties());
         relationship.setEndDate(LocalDate.now(ZoneOffset.UTC));
 
         mongoRepository.save(relationship);
-
         adapter.enrichNodes(List.of(relationship));
 
-        log.info("[{}] Successfully expired relationship with ID={}", adapterName, relationship.getId());
+        log.info("[{}] Successfully expired relationship by ID={}", adapterName, relationship.getId());
 
         return relationshipMapper.toRelationshipResponse(relationship, objectMapper);
     }
@@ -196,44 +196,4 @@ public class RelationshipServiceImpl implements RelationshipService {
         return Optional.ofNullable(adapters.get(adapterName)).orElseThrow(() -> new IllegalArgumentException(
                 "Unknown adapter: %s. Available adapters: %s".formatted(adapterName, adapters.keySet())));
     }
-
-    // private RelationshipResponse enrichNodeProperties(RelationshipResponse
-    // response, Relationship rel,
-    // Map<String, NodeSummary> summaries) {
-    // applyNodeSummary(response.getFrom(), rel.getFrom(), summaries);
-    // applyNodeSummary(response.getTo(), rel.getTo(), summaries);
-    //
-    // return response;
-    // }
-    //
-    // private void applyNodeSummary(RelationshipNodeResponse nodeResponse,
-    // RelationshipNode node,
-    // Map<String, NodeSummary> summaries) {
-    // if (nodeResponse == null || node == null) {
-    // return;
-    // }
-    //
-    // NodeSummary summary = summaries.get(node.getIdentifier());
-    //
-    // if (summary != null) {
-    // nodeResponse.setProperties(summary.toProperties());
-    // }
-    // }
-    //
-    // private RelationshipResponse toEnrichedResponse(Relationship relationship,
-    // NodeSummary fromSummary,
-    // NodeSummary toSummary) {
-    // RelationshipResponse response =
-    // relationshipMapper.toRelationshipResponse(relationship, objectMapper);
-    //
-    // if (fromSummary != null) {
-    // response.getFrom().setProperties(fromSummary.toProperties());
-    // }
-    //
-    // if (toSummary != null) {
-    // response.getTo().setProperties(toSummary.toProperties());
-    // }
-    //
-    // return response;
-    // }
 }

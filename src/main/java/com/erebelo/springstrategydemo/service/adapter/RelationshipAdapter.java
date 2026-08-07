@@ -25,9 +25,9 @@ public interface RelationshipAdapter {
 
     <P> RelationshipProperties resolveRelationshipProperties(P properties);
 
-    void enrichNodes(List<Relationship> relationships);
+    <P> void enrichRelationshipProperties(P properties);
 
-    <P> void resolveExpireRelationshipProperties(P properties);
+    void enrichNodes(List<Relationship> relationships);
 
     /*
      * Base criteria creation.
@@ -36,20 +36,20 @@ public interface RelationshipAdapter {
     Criteria baseIdentityCriteria(RelationshipDataSource adapterName, RelationshipNodeRequest from,
             RelationshipNodeRequest to);
 
-    <P> Criteria baseSearchCriteria(RelationshipDataSource adapterName, RelationshipSearchRequest<P> request);
-
     Criteria baseByIdCriteria(RelationshipDataSource adapterName, String id);
 
+    <P> Criteria baseSearchCriteria(RelationshipDataSource adapterName, RelationshipSearchRequest<P> request);
+
     /*
-     * Optional criteria customization
+     * Optional criteria customization.
      */
 
     default <P> void customUpsertCriteria(RelationshipRequest<P> request, Criteria criteria) {
     }
 
-    default <P> void customSearchCriteria(RelationshipSearchRequest<P> request, Criteria criteria) {
+    default <P> void customExpireCriteria(RelationshipExpireRequest<P> request, Criteria criteria) {
     }
 
-    default <P> void customExpireCriteria(RelationshipExpireRequest<P> request, Criteria criteria) {
+    default <P> void customSearchCriteria(RelationshipSearchRequest<P> request, Criteria criteria) {
     }
 }

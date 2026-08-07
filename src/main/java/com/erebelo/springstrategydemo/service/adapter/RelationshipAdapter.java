@@ -27,7 +27,7 @@ public interface RelationshipAdapter {
 
     <P> void enrichRelationshipProperties(P properties);
 
-    void enrichNodes(List<Relationship> relationships);
+    void enrichRelationshipNodeProperties(List<Relationship> relationships);
 
     /*
      * Base criteria creation.

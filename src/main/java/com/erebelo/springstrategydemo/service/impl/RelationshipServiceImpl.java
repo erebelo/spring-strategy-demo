@@ -4,6 +4,7 @@ import com.erebelo.springstrategydemo.exception.model.NotFoundException;
 import com.erebelo.springstrategydemo.mapper.RelationshipMapper;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.RelationshipRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.expire.RelationshipExpireRequest;
+import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipSearchRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.response.RelationshipResponse;
 import com.erebelo.springstrategydemo.model.entity.relationship.Relationship;
 import com.erebelo.springstrategydemo.model.entity.relationship.RelationshipNode;
@@ -21,6 +22,9 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -127,7 +131,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         relationship.setEndDate(LocalDate.now(ZoneOffset.UTC));
 
         mongoRepository.save(relationship);
-        adapter.enrichNodes(List.of(relationship));
+        adapter.enrichRelationshipNodeProperties(List.of(relationship));
 
         log.info("[{}] Successfully expired relationship with ID={}", adapterName, relationship.getId());
 
@@ -153,44 +157,37 @@ public class RelationshipServiceImpl implements RelationshipService {
         relationship.setEndDate(LocalDate.now(ZoneOffset.UTC));
 
         mongoRepository.save(relationship);
-        adapter.enrichNodes(List.of(relationship));
+        adapter.enrichRelationshipNodeProperties(List.of(relationship));
 
         log.info("[{}] Successfully expired relationship by ID={}", adapterName, relationship.getId());
 
         return relationshipMapper.toRelationshipResponse(relationship, objectMapper);
     }
 
-    // @Transactional(readOnly = true)
-    // public <P> PaginatedResponse<RelationshipResponse>
-    // searchRelationships(RelationshipDataSource adapterName,
-    // RelationshipSearchRequest<P> request, PaginationRequestDto pagination) {
-    // log.info("[{}] Fetching relationships with search criteria", adapterName);
-    //
-    // RelationshipAdapter adapter = getAdapter(adapterName);
-    //
-    // Criteria criteria = adapter.defaultSearchCriteria(adapterName, request);
-    // adapter.buildSearchCriteria(request, criteria);
-    //
-    // Pageable pageable = PaginationUtil.createPageable(pagination.getPage(),
-    // pagination.getPageSize(),
-    // Sort.unsorted());
-    //
-    // Page<@NonNull Relationship> relationshipPage =
-    // mongoRepository.findByCriteria(criteria, pageable,
-    // Relationship.class);
-    //
-    // log.info("[{}] Found {} relationships matching criteria", adapterName,
-    // relationshipPage.getTotalElements());
-    //
-    // List<Relationship> relationships = relationshipPage.getContent();
-    // Map<String, NodeSummary> summaries = adapter.enrichNodes(relationships);
-    //
-    // return PaginatedResponse.fromPage(relationshipPage,
-    // relationship -> enrichNodeProperties(
-    // relationshipMapper.toRelationshipResponse(relationship, objectMapper),
-    // relationship,
-    // summaries));
-    // }
+    @Override
+    @Transactional(readOnly = true)
+    public <P> Page<@NonNull RelationshipResponse> searchRelationships(RelationshipDataSource adapterName,
+            RelationshipSearchRequest<P> request, Pageable pageable) {
+        log.info("[{}] Fetching relationships with search criteria", adapterName);
+
+        RelationshipAdapter adapter = getAdapter(adapterName);
+
+        Criteria criteria = adapter.baseSearchCriteria(adapterName, request);
+        adapter.customSearchCriteria(request, criteria);
+
+        Page<@NonNull Relationship> relationshipPage = mongoRepository.findByCriteria(criteria, pageable,
+                Relationship.class);
+        List<Relationship> relationships = relationshipPage.getContent();
+
+        if (!relationships.isEmpty()) {
+            adapter.enrichRelationshipNodeProperties(relationships);
+        }
+
+        log.info("[{}] Found {} relationships", adapterName, relationshipPage.getTotalElements());
+
+        return relationshipPage
+                .map(relationship -> relationshipMapper.toRelationshipResponse(relationship, objectMapper));
+    }
 
     private RelationshipAdapter getAdapter(RelationshipDataSource adapterName) {
         return Optional.ofNullable(adapters.get(adapterName)).orElseThrow(() -> new IllegalArgumentException(

@@ -3,17 +3,22 @@ package com.erebelo.springstrategydemo.service.adapter.impl;
 import com.erebelo.springstrategydemo.exception.model.NotFoundException;
 import com.erebelo.springstrategydemo.mapper.NovaRelationshipMapper;
 import com.erebelo.springstrategydemo.mapper.RelationshipMapper;
+import com.erebelo.springstrategydemo.model.dto.relationship.nova.NovaNonSellingRelationshipPropertiesSearchRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.nova.NovaSellingRelationshipPropertiesRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.RelationshipNodeRequest;
+import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipNodeSearchRequest;
+import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipSearchRequest;
 import com.erebelo.springstrategydemo.model.entity.contract.Contract;
 import com.erebelo.springstrategydemo.model.entity.relationship.Relationship;
 import com.erebelo.springstrategydemo.model.entity.relationship.RelationshipNode;
 import com.erebelo.springstrategydemo.model.entity.relationship.RelationshipProperties;
 import com.erebelo.springstrategydemo.model.entity.relationship.nova.NovaSellingRelationshipProperties;
 import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipDataSource;
+import com.erebelo.springstrategydemo.model.enums.relationship.nova.NovaRelationshipLabel;
 import com.erebelo.springstrategydemo.model.enums.relationship.nova.NovaRelationshipStatus;
 import com.erebelo.springstrategydemo.repository.MongoRepository;
 import com.erebelo.springstrategydemo.service.adapter.AbstractRelationshipAdapter;
+import com.erebelo.springstrategydemo.util.AdapterUtils;
 import jakarta.validation.Validator;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +27,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
@@ -98,7 +104,9 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
     }
 
     @Override
-    public void enrichNodes(List<Relationship> relationships) {
+    public void enrichRelationshipNodeProperties(List<Relationship> relationships) {
+        log.debug("[{}] Enriching relationship node properties", getAdapterName());
+
         Set<String> nodeIdentifiers = relationships.stream().flatMap(
                 relationship -> Stream.of(relationship.getFrom().getIdentifier(), relationship.getTo().getIdentifier()))
                 .collect(Collectors.toSet());
@@ -113,6 +121,32 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
 
             relationship.setTo(relationshipMapper.enrichRelationshipNode(relationship.getTo(),
                     contractsByReferenceId.get(relationship.getTo().getIdentifier()), objectMapper));
+        }
+    }
+
+    @Override
+    public <P> void customSearchCriteria(RelationshipSearchRequest<P> request, Criteria criteria) {
+        log.debug("[{}] Customizing search criteria", getAdapterName());
+
+        AdapterUtils.addIfPresent(criteria, "from.type",
+                () -> AdapterUtils.mapIfNoNull(request.getFrom(), RelationshipNodeSearchRequest::getType));
+        AdapterUtils.addIfPresent(criteria, "from.identifier",
+                () -> AdapterUtils.mapIfNoNull(request.getFrom(), RelationshipNodeSearchRequest::getIdentifier));
+        AdapterUtils.addIfPresent(criteria, "to.type",
+                () -> AdapterUtils.mapIfNoNull(request.getTo(), RelationshipNodeSearchRequest::getType));
+        AdapterUtils.addIfPresent(criteria, "to.identifier",
+                () -> AdapterUtils.mapIfNoNull(request.getTo(), RelationshipNodeSearchRequest::getIdentifier));
+
+        criteria.and("properties.relationshipLabel").is(NovaRelationshipLabel.SELLING_RELATIONSHIP);
+
+        NovaNonSellingRelationshipPropertiesSearchRequest novaRelPropertiesSearchRequest = (NovaNonSellingRelationshipPropertiesSearchRequest) request
+                .getProperties();
+
+        if (novaRelPropertiesSearchRequest != null) {
+            AdapterUtils.addIfPresent(criteria, "properties.relationshipStatus",
+                    novaRelPropertiesSearchRequest::getRelationshipStatus);
+            AdapterUtils.addIfPresent(criteria, "properties.relationshipType",
+                    novaRelPropertiesSearchRequest::getRelationshipType);
         }
     }
 }

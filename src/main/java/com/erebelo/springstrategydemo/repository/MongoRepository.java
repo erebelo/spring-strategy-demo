@@ -4,17 +4,13 @@ import java.util.Collection;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bson.Document;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.FacetOperation;
-import org.springframework.data.mongodb.core.aggregation.MatchOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -117,76 +113,36 @@ public class MongoRepository {
     }
 
     /**
-     * Find multiple documents by custom criteria.
-     *
-     * @param criteria
-     *            the criteria to match
-     * @param entityClass
-     *            the document class type
-     * @param includeFields
-     *            optional fields to include in the result
-     * @param <T>
-     *            the document type
-     * @return the matching documents
-     */
-    public <T> List<T> findByCriteria(Criteria criteria, Class<T> entityClass, String... includeFields) {
-        log.debug("Finding multiple {} by custom criteria with projections", entityClass.getSimpleName());
-
-        Query query = new Query(criteria);
-        for (String field : includeFields) {
-            query.fields().include(field);
-        }
-
-        List<T> results = mongoTemplate.find(query, entityClass);
-
-        log.debug("Found {} results for {} with custom criteria", results.size(), entityClass.getSimpleName());
-
-        return results;
-    }
-
-    /**
-     * Find documents by multiple field criteria with pagination.
+     * Find documents by custom criteria with pagination.
      *
      * @param criteria
      *            the criteria to match
      * @param pageable
-     *            the pagination information
+     *            pagination information
      * @param entityClass
      *            the document class type
      * @param <T>
      *            the document type
-     * @return paginated results
+     * @return a paginated result containing the matching documents
      */
     public <T> Page<@NonNull T> findByCriteria(Criteria criteria, Pageable pageable, Class<T> entityClass) {
-        log.debug("Finding {} by criteria with pagination", entityClass.getSimpleName());
+        log.debug("Finding {} by custom criteria with pagination: page={}, size={}", entityClass.getSimpleName(),
+                pageable.getPageNumber(), pageable.getPageSize());
 
-        String collectionName = mongoTemplate.getCollectionName(entityClass);
+        Query query = new Query(criteria).with(pageable);
 
-        MatchOperation matchStage = Aggregation.match(criteria);
-        FacetOperation facetStage = Aggregation
-                .facet(Aggregation.skip(pageable.getOffset()), Aggregation.limit(pageable.getPageSize())).as("data")
-                .and(Aggregation.count().as("count")).as("totalCount");
+        List<T> content = mongoTemplate.find(query, entityClass);
 
-        Aggregation aggregation = Aggregation.newAggregation(matchStage, facetStage);
+        // Count all matching documents ignoring pagination.
+        // Query.with(pageable) adds skip/limit for the result page, but the total count
+        // must represent the complete result set.
+        long total = mongoTemplate.count(Query.of(query).limit(-1).skip(-1), entityClass);
 
-        List<Document> results = mongoTemplate.aggregate(aggregation, collectionName, Document.class)
-                .getMappedResults();
+        Page<@NonNull T> result = PageableExecutionUtils.getPage(content, pageable, () -> total);
 
-        if (results.isEmpty()) {
-            return new PageImpl<>(List.of(), pageable, 0);
-        }
+        log.debug("Found {} {}(s) out of {} total", content.size(), entityClass.getSimpleName(), total);
 
-        Document result = results.getFirst();
-        List<Document> dataList = result.getList("data", Document.class);
-        List<Document> countList = result.getList("totalCount", Document.class);
-
-        long total = (countList != null && !countList.isEmpty()) ? countList.getFirst().getInteger("count", 0) : 0;
-
-        List<T> entities = dataList.stream().map(doc -> mongoTemplate.getConverter().read(entityClass, doc)).toList();
-
-        log.debug("Found {} total, returning page of {} for {}", total, entities.size(), entityClass.getSimpleName());
-
-        return new PageImpl<>(entities, pageable, total);
+        return result;
     }
 
     /**

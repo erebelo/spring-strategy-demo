@@ -57,49 +57,10 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
         return resolveNode(toNode);
     }
 
-    // @Override
-    // public RelationshipNode resolveFromNode(RelationshipNodeRequest fromNode) {
-    // log.debug("[{}] Resolving from node for type={}, identifier={}",
-    // getAdapterName(), fromNode.getType(),
-    // fromNode.getIdentifier());
-    //
-    // validateNodeType(fromNode.getType(), true, getAdapterName());
-    //
-    // Contract contract = mongoRepository.findOneByField("referenceId",
-    // fromNode.getIdentifier(), Contract.class,
-    // CONTRACT_FIELDS);
-    //
-    // if (contract == null) {
-    // throw new NotFoundException("from node not found for type=%s,
-    // identifier=%s".formatted(fromNode.getType(),
-    // fromNode.getIdentifier()));
-    // }
-    //
-    // return mapper.toRelationshipNode(fromNode, contract, objectMapper);
-    // }
-
-    // @Override
-    // public RelationshipNode resolveToNode(RelationshipNodeRequest toNode) {
-    // log.debug("[{}] Resolving to node for type={}, identifier={}",
-    // getAdapterName(), toNode.getType(),
-    // toNode.getIdentifier());
-    //
-    // validateNodeType(toNode.getType(), true, getAdapterName());
-    //
-    // Contract contract = mongoRepository.findOneByField("referenceId",
-    // toNode.getIdentifier(), Contract.class,
-    // CONTRACT_FIELDS);
-    //
-    // if (contract == null) {
-    // throw new NotFoundException(
-    // "to node not found for type=%s, identifier=%s".formatted(toNode.getType(),
-    // toNode.getIdentifier()));
-    // }
-    //
-    // return mapper.toRelationshipNode(toNode, contract, objectMapper);
-    // }
-
     private RelationshipNode resolveNode(RelationshipNodeRequest nodeRequest) {
+        log.debug("[{}] Resolving node for type={}, identifier={}", getAdapterName(), nodeRequest.getType(),
+                nodeRequest.getIdentifier());
+
         Contract contract = mongoRepository.findOneByField("referenceId", nodeRequest.getIdentifier(), Contract.class,
                 CONTRACT_FIELDS);
 
@@ -139,5 +100,9 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
             relationship.setTo(mapper.toRelationshipNode(relationship.getTo(),
                     contractsByReferenceId.get(relationship.getTo().getIdentifier()), objectMapper));
         }
+    }
+
+    @Override
+    public <P> void resolveExpireRelationshipProperties(P properties) {
     }
 }

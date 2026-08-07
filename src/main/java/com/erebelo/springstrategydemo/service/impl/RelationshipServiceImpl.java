@@ -13,13 +13,6 @@ import com.erebelo.springstrategydemo.repository.MongoRepository;
 import com.erebelo.springstrategydemo.service.RelationshipService;
 import com.erebelo.springstrategydemo.service.adapter.RelationshipAdapter;
 import com.erebelo.springstrategydemo.support.DeepObjectComparator;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
-
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -27,6 +20,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Service
@@ -64,8 +63,8 @@ public class RelationshipServiceImpl implements RelationshipService {
         RelationshipProperties properties = adapter.resolveRelationshipProperties(request.getProperties());
         properties.setRelationshipDataSource(adapterName);
 
-        Criteria criteria = adapter.defaultUpsertCriteria(adapterName, request);
-        adapter.buildUpsertCriteria(request, criteria);
+        Criteria criteria = adapter.baseIdentityCriteria(adapterName, request.getFrom(), request.getTo());
+        adapter.customUpsertCriteria(request, criteria);
 
         Relationship existingRelationship = mongoRepository.findOneByCriteria(criteria, Relationship.class);
 
@@ -114,8 +113,8 @@ public class RelationshipServiceImpl implements RelationshipService {
 
         RelationshipAdapter adapter = getAdapter(adapterName);
 
-        Criteria criteria = adapter.defaultExpireCriteria(adapterName, request);
-        adapter.buildExpireCriteria(request, criteria);
+        Criteria criteria = adapter.baseIdentityCriteria(adapterName, request.getFrom(), request.getTo());
+        adapter.customExpireCriteria(request, criteria);
 
         Relationship relationship = mongoRepository.findOneByCriteria(criteria, Relationship.class);
 
@@ -140,7 +139,7 @@ public class RelationshipServiceImpl implements RelationshipService {
 
         RelationshipAdapter adapter = getAdapter(adapterName);
 
-        Criteria criteria = adapter.defaultExpireByIdCriteria(adapterName, relationshipId);
+        Criteria criteria = adapter.baseByIdCriteria(adapterName, relationshipId);
 
         Relationship relationship = mongoRepository.findOneByCriteria(criteria, Relationship.class);
 
@@ -154,38 +153,44 @@ public class RelationshipServiceImpl implements RelationshipService {
 
         mongoRepository.save(relationship);
 
-        adapter.enri
+        adapter.enrichNodes(List.of(relationship));
+
         log.info("[{}] Successfully expired relationship with ID={}", adapterName, relationship.getId());
 
         return relationshipMapper.toRelationshipResponse(relationship, objectMapper);
     }
 
-//    @Transactional(readOnly = true)
-//    public <P> PaginatedResponse<RelationshipResponse> searchRelationships(RelationshipDataSource adapterName,
-//            RelationshipSearchRequest<P> request, PaginationRequestDto pagination) {
-//        log.info("[{}] Fetching relationships with search criteria", adapterName);
-//
-//        RelationshipAdapter adapter = getAdapter(adapterName);
-//
-//        Criteria criteria = adapter.defaultSearchCriteria(adapterName, request);
-//        adapter.buildSearchCriteria(request, criteria);
-//
-//        Pageable pageable = PaginationUtil.createPageable(pagination.getPage(), pagination.getPageSize(),
-//                Sort.unsorted());
-//
-//        Page<@NonNull Relationship> relationshipPage = mongoRepository.findByCriteria(criteria, pageable,
-//                Relationship.class);
-//
-//        log.info("[{}] Found {} relationships matching criteria", adapterName, relationshipPage.getTotalElements());
-//
-//        List<Relationship> relationships = relationshipPage.getContent();
-//        Map<String, NodeSummary> summaries = adapter.enrichNodes(relationships);
-//
-//        return PaginatedResponse.fromPage(relationshipPage,
-//                relationship -> enrichNodeProperties(
-//                        relationshipMapper.toRelationshipResponse(relationship, objectMapper), relationship,
-//                        summaries));
-//    }
+    // @Transactional(readOnly = true)
+    // public <P> PaginatedResponse<RelationshipResponse>
+    // searchRelationships(RelationshipDataSource adapterName,
+    // RelationshipSearchRequest<P> request, PaginationRequestDto pagination) {
+    // log.info("[{}] Fetching relationships with search criteria", adapterName);
+    //
+    // RelationshipAdapter adapter = getAdapter(adapterName);
+    //
+    // Criteria criteria = adapter.defaultSearchCriteria(adapterName, request);
+    // adapter.buildSearchCriteria(request, criteria);
+    //
+    // Pageable pageable = PaginationUtil.createPageable(pagination.getPage(),
+    // pagination.getPageSize(),
+    // Sort.unsorted());
+    //
+    // Page<@NonNull Relationship> relationshipPage =
+    // mongoRepository.findByCriteria(criteria, pageable,
+    // Relationship.class);
+    //
+    // log.info("[{}] Found {} relationships matching criteria", adapterName,
+    // relationshipPage.getTotalElements());
+    //
+    // List<Relationship> relationships = relationshipPage.getContent();
+    // Map<String, NodeSummary> summaries = adapter.enrichNodes(relationships);
+    //
+    // return PaginatedResponse.fromPage(relationshipPage,
+    // relationship -> enrichNodeProperties(
+    // relationshipMapper.toRelationshipResponse(relationship, objectMapper),
+    // relationship,
+    // summaries));
+    // }
 
     private RelationshipAdapter getAdapter(RelationshipDataSource adapterName) {
         return Optional.ofNullable(adapters.get(adapterName)).orElseThrow(() -> new IllegalArgumentException(

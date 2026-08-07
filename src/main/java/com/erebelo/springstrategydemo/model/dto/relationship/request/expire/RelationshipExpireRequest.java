@@ -1,5 +1,6 @@
 package com.erebelo.springstrategydemo.model.dto.relationship.request.expire;
 
+import com.erebelo.springstrategydemo.model.dto.relationship.request.RelationshipNodeRequest;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.Valid;
@@ -23,11 +24,11 @@ public class RelationshipExpireRequest<P> {
 
     @Valid
     @NotNull
-    private RelationshipNodeExpireRequest from;
+    private RelationshipNodeRequest from;
 
     @Valid
     @NotNull
-    private RelationshipNodeExpireRequest to;
+    private RelationshipNodeRequest to;
 
     @Valid
     private P properties;

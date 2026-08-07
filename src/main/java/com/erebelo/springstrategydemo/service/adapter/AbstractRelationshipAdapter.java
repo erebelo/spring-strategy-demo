@@ -1,8 +1,7 @@
 package com.erebelo.springstrategydemo.service.adapter;
 
 import com.erebelo.springstrategydemo.exception.model.BadRequestException;
-import com.erebelo.springstrategydemo.model.dto.relationship.request.RelationshipRequest;
-import com.erebelo.springstrategydemo.model.dto.relationship.request.expire.RelationshipExpireRequest;
+import com.erebelo.springstrategydemo.model.dto.relationship.request.RelationshipNodeRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipSearchRequest;
 import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipDataSource;
 import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipNodeType;
@@ -21,21 +20,23 @@ public abstract class AbstractRelationshipAdapter implements RelationshipAdapter
         this.validator = validator;
     }
 
-    public final <P> Criteria defaultUpsertCriteria(RelationshipDataSource adapterName,
-            RelationshipRequest<P> request) {
+    @Override
+    public final Criteria baseIdentityCriteria(RelationshipDataSource adapterName, RelationshipNodeRequest from,
+            RelationshipNodeRequest to) {
         Criteria criteria = new Criteria();
 
-        criteria.and("from.type").is(request.getFrom().getType());
-        criteria.and("from.identifier").is(request.getFrom().getIdentifier());
-        criteria.and("to.type").is(request.getTo().getType());
-        criteria.and("to.identifier").is(request.getTo().getIdentifier());
+        criteria.and("from.type").is(from.getType());
+        criteria.and("from.identifier").is(from.getIdentifier());
+        criteria.and("to.type").is(to.getType());
+        criteria.and("to.identifier").is(to.getIdentifier());
         criteria.and("properties.relationshipStatus").ne("EXPIRED");
         criteria.and("properties.relationshipDataSource").is(adapterName);
 
         return criteria;
     }
 
-    public final <P> Criteria defaultSearchCriteria(RelationshipDataSource adapterName,
+    @Override
+    public final <P> Criteria baseSearchCriteria(RelationshipDataSource adapterName,
             RelationshipSearchRequest<P> request) {
         Criteria criteria = new Criteria();
 
@@ -47,21 +48,8 @@ public abstract class AbstractRelationshipAdapter implements RelationshipAdapter
         return criteria;
     }
 
-    public final <P> Criteria defaultExpireCriteria(RelationshipDataSource adapterName,
-            RelationshipExpireRequest<P> request) {
-        Criteria criteria = new Criteria();
-
-        criteria.and("from.type").is(request.getFrom().getType());
-        criteria.and("from.identifier").is(request.getFrom().getIdentifier());
-        criteria.and("to.type").is(request.getTo().getType());
-        criteria.and("to.identifier").is(request.getTo().getIdentifier());
-        criteria.and("properties.relationshipStatus").ne("EXPIRED");
-        criteria.and("properties.relationshipDataSource").is(adapterName);
-
-        return criteria;
-    }
-
-    public final Criteria defaultExpireByIdCriteria(RelationshipDataSource adapterName, String id) {
+    @Override
+    public final Criteria baseByIdCriteria(RelationshipDataSource adapterName, String id) {
         Criteria criteria = new Criteria();
 
         criteria.and("_id").is(id);

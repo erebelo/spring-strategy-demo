@@ -13,6 +13,10 @@ import org.springframework.data.mongodb.core.query.Criteria;
 
 public interface RelationshipAdapter {
 
+    /*
+     * Core adapter operations.
+     */
+
     RelationshipDataSource getAdapterName();
 
     RelationshipNode resolveFromNode(RelationshipNodeRequest fromNode);
@@ -25,21 +29,27 @@ public interface RelationshipAdapter {
 
     <P> void resolveExpireRelationshipProperties(P properties);
 
-    /**
-     * Optional adapter-specific criteria customization.
+    /*
+     * Base criteria creation.
      */
-    default <P> void buildUpsertCriteria(RelationshipRequest<P> request, Criteria criteria) {
+
+    Criteria baseIdentityCriteria(RelationshipDataSource adapterName, RelationshipNodeRequest from,
+            RelationshipNodeRequest to);
+
+    <P> Criteria baseSearchCriteria(RelationshipDataSource adapterName, RelationshipSearchRequest<P> request);
+
+    Criteria baseByIdCriteria(RelationshipDataSource adapterName, String id);
+
+    /*
+     * Optional criteria customization
+     */
+
+    default <P> void customUpsertCriteria(RelationshipRequest<P> request, Criteria criteria) {
     }
 
-    /**
-     * Optional adapter-specific criteria customization.
-     */
-    default <P> void buildSearchCriteria(RelationshipSearchRequest<P> request, Criteria criteria) {
+    default <P> void customSearchCriteria(RelationshipSearchRequest<P> request, Criteria criteria) {
     }
 
-    /**
-     * Optional adapter-specific criteria customization.
-     */
-    default <P> void buildExpireCriteria(RelationshipExpireRequest<P> request, Criteria criteria) {
+    default <P> void customExpireCriteria(RelationshipExpireRequest<P> request, Criteria criteria) {
     }
 }

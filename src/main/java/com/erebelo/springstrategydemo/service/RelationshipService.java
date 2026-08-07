@@ -14,7 +14,8 @@ public interface RelationshipService {
 
     RelationshipResponse expireRelationshipById(RelationshipDataSource adapterName, String relationshipId);
 
-//    <P> PaginatedResponse<RelationshipResponse> searchRelationships(RelationshipDataSource adapterName,
-//            RelationshipSearchRequest<P> request, PaginationRequestDto pagination);
+    // <P> PaginatedResponse<RelationshipResponse>
+    // searchRelationships(RelationshipDataSource adapterName,
+    // RelationshipSearchRequest<P> request, PaginationRequestDto pagination);
 
 }

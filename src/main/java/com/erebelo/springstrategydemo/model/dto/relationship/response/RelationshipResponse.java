@@ -20,7 +20,7 @@ public class RelationshipResponse {
     private String id;
     private RelationshipNodeResponse from;
     private RelationshipNodeResponse to;
-    private Map<String, String> properties;
+    private Map<String, Object> properties;
     private LocalDate startDate;
     private LocalDate endDate;
 

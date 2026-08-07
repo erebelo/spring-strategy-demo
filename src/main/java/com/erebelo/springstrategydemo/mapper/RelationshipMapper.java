@@ -1,10 +1,13 @@
 package com.erebelo.springstrategydemo.mapper;
 
+import com.erebelo.springstrategydemo.model.dto.relationship.request.RelationshipNodeRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.response.RelationshipNodeResponse;
 import com.erebelo.springstrategydemo.model.dto.relationship.response.RelationshipResponse;
+import com.erebelo.springstrategydemo.model.entity.contract.Contract;
 import com.erebelo.springstrategydemo.model.entity.relationship.Relationship;
 import com.erebelo.springstrategydemo.model.entity.relationship.RelationshipNode;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,30 +20,40 @@ import tools.jackson.databind.ObjectMapper;
 public interface RelationshipMapper {
 
     /*
-     * RelationshipResponse and RelationshipNodeResponse mappers starts here
+     * RelationshipNode mappings.
      */
 
-    @Mapping(target = "properties", source = "properties", qualifiedByName = "mapProperties")
-    RelationshipResponse toRelationshipResponse(Relationship relationship, @Context ObjectMapper objectMapper);
+    @Mapping(target = "properties", source = "contract", qualifiedByName = "objectToProperties")
+    RelationshipNode toRelationshipNode(RelationshipNodeRequest nodeRequest, Contract contract,
+            @Context ObjectMapper objectMapper);
 
-    RelationshipNodeResponse toRelationshipNodeResponse(
-            RelationshipNode relationshipNode/*
-                                                 * ,
-                                                 * 
-                                                 * @Context ObjectMapper objectMapper
-                                                 */);
+    @Mapping(target = "properties", source = "contract", qualifiedByName = "objectToProperties")
+    RelationshipNode enrichRelationshipNode(RelationshipNode node, Contract contract,
+            @Context ObjectMapper objectMapper);
 
     /*
-     * Properties mapper starts here
+     * RelationshipResponse and RelationshipNodeResponse mappings.
      */
 
-    @Named("mapProperties")
-    default Map<String, Object> mapProperties(Object properties, @Context ObjectMapper objectMapper) {
-        if (properties == null) {
+    @Mapping(target = "properties", source = "properties", qualifiedByName = "objectToProperties")
+    RelationshipResponse toRelationshipResponse(Relationship relationship, @Context ObjectMapper objectMapper);
+
+    RelationshipNodeResponse toRelationshipNodeResponse(RelationshipNode node);
+
+    /*
+     * Property mappings.
+     */
+
+    @Named("objectToProperties")
+    default Map<String, Object> objectToProperties(Object source, @Context ObjectMapper objectMapper) {
+        if (source == null) {
             return null;
         }
 
-        return objectMapper.convertValue(properties, new TypeReference<>() {
+        Map<String, Object> properties = objectMapper.convertValue(source, new TypeReference<>() {
         });
+
+        return properties.entrySet().stream().filter(entry -> entry.getValue() != null)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

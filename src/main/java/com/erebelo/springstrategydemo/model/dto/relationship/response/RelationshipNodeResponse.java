@@ -19,6 +19,6 @@ public class RelationshipNodeResponse {
 
     private RelationshipNodeType type;
     private String identifier;
-    private Map<String, String> properties;
+    private Map<String, Object> properties;
 
 }

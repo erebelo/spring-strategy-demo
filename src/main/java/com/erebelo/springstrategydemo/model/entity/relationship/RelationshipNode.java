@@ -27,6 +27,6 @@ public class RelationshipNode {
     private String identifier;
 
     @Transient
-    private Map<String, String> properties;
+    private Map<String, Object> properties;
 
 }

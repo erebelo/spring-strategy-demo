@@ -1,10 +1,10 @@
 package com.erebelo.springstrategydemo.model.entity.contract;
 
 import com.erebelo.springstrategydemo.model.entity.BaseEntity;
-import com.erebelo.springstrategydemo.model.enums.Status;
 import com.erebelo.springstrategydemo.model.enums.contract.ContractBusinessChannel;
 import com.erebelo.springstrategydemo.model.enums.contract.ContractProductType;
 import com.erebelo.springstrategydemo.model.enums.contract.ContractRole;
+import com.erebelo.springstrategydemo.model.enums.contract.ContractStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -43,7 +43,7 @@ public class Contract extends BaseEntity {
     private ContractProductType productType;
 
     @NotNull
-    private Status status;
+    private ContractStatus status;
 
     @NotNull
     private LocalDate startDate;

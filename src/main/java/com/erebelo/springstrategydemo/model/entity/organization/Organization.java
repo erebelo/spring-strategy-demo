@@ -1,7 +1,7 @@
 package com.erebelo.springstrategydemo.model.entity.organization;
 
 import com.erebelo.springstrategydemo.model.entity.BaseEntity;
-import com.erebelo.springstrategydemo.model.enums.Status;
+import com.erebelo.springstrategydemo.model.enums.organization.OrganizationStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -31,7 +31,7 @@ public class Organization extends BaseEntity {
     private String name;
 
     @NotNull
-    private Status status;
+    private OrganizationStatus status;
 
     @NotNull
     private LocalDate startDate;

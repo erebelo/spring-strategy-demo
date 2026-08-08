@@ -2,9 +2,11 @@ package com.erebelo.springstrategydemo.service.adapter;
 
 import com.erebelo.springstrategydemo.exception.model.BadRequestException;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.RelationshipNodeRequest;
+import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipPropertiesSearchRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipSearchRequest;
-import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipDataSource;
+import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipAdapterType;
 import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipNodeType;
+import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipStatus;
 import com.erebelo.springstrategydemo.util.AdapterUtils;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -21,7 +23,7 @@ public abstract class AbstractRelationshipAdapter implements RelationshipAdapter
     }
 
     @Override
-    public final Criteria baseIdentityCriteria(RelationshipDataSource adapterName, RelationshipNodeRequest from,
+    public final Criteria baseIdentityCriteria(RelationshipAdapterType adapterType, RelationshipNodeRequest from,
             RelationshipNodeRequest to) {
         Criteria criteria = new Criteria();
 
@@ -29,41 +31,43 @@ public abstract class AbstractRelationshipAdapter implements RelationshipAdapter
         criteria.and("from.identifier").is(from.getIdentifier());
         criteria.and("to.type").is(to.getType());
         criteria.and("to.identifier").is(to.getIdentifier());
-        criteria.and("properties.relationshipStatus").ne("EXPIRED");
-        criteria.and("properties.relationshipDataSource").is(adapterName);
+        criteria.and("properties.relationshipStatus").ne(RelationshipStatus.EXPIRED);
+        criteria.and("adapterType").is(adapterType);
 
         return criteria;
     }
 
     @Override
-    public final <P> Criteria baseSearchCriteria(RelationshipDataSource adapterName,
-            RelationshipSearchRequest<P> request) {
+    public final Criteria baseByIdCriteria(RelationshipAdapterType adapterType, String id) {
+        Criteria criteria = new Criteria();
+
+        criteria.and("_id").is(id);
+        criteria.and("properties.relationshipStatus").ne(RelationshipStatus.EXPIRED);
+        criteria.and("adapterType").is(adapterType);
+
+        return criteria;
+    }
+
+    @Override
+    public final <P extends RelationshipPropertiesSearchRequest> Criteria baseSearchCriteria(
+            RelationshipAdapterType adapterType, RelationshipSearchRequest<P> request) {
         Criteria criteria = new Criteria();
 
         AdapterUtils.addIfPresent(criteria, "startDate", request::getStartDate);
         AdapterUtils.addIfPresent(criteria, "endDate", request::getEndDate);
+        AdapterUtils.addIfPresent(criteria, "properties.relationshipStatus", () -> AdapterUtils
+                .mapIfNoNull(request.getProperties(), RelationshipPropertiesSearchRequest::getRelationshipStatus));
 
-        criteria.and("properties.relationshipDataSource").is(adapterName);
-
-        return criteria;
-    }
-
-    @Override
-    public final Criteria baseByIdCriteria(RelationshipDataSource adapterName, String id) {
-        Criteria criteria = new Criteria();
-
-        criteria.and("_id").is(id);
-        criteria.and("properties.relationshipStatus").ne("EXPIRED");
-        criteria.and("properties.relationshipDataSource").is(adapterName);
+        criteria.and("adapterType").is(adapterType);
 
         return criteria;
     }
 
     protected final void validateNodeType(RelationshipNodeType nodeType, boolean isFromNode,
-            RelationshipDataSource adapterName) {
+            RelationshipAdapterType adapterType) {
         Set<RelationshipNodeType> validTypes = isFromNode
-                ? RelationshipNodeType.fromNodeTypes(adapterName)
-                : RelationshipNodeType.toNodeTypes(adapterName);
+                ? RelationshipNodeType.fromNodeTypes(adapterType)
+                : RelationshipNodeType.toNodeTypes(adapterType);
 
         if (nodeType == null || !validTypes.contains(nodeType)) {
             String nodeTypeName = isFromNode ? "from.type" : "to.type";

@@ -7,15 +7,15 @@ import com.erebelo.springstrategydemo.model.dto.relationship.nova.NovaNonSelling
 import com.erebelo.springstrategydemo.model.dto.relationship.nova.NovaSellingRelationshipPropertiesRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.RelationshipNodeRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipNodeSearchRequest;
+import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipPropertiesSearchRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipSearchRequest;
 import com.erebelo.springstrategydemo.model.entity.contract.Contract;
 import com.erebelo.springstrategydemo.model.entity.relationship.Relationship;
 import com.erebelo.springstrategydemo.model.entity.relationship.RelationshipNode;
 import com.erebelo.springstrategydemo.model.entity.relationship.RelationshipProperties;
 import com.erebelo.springstrategydemo.model.entity.relationship.nova.NovaSellingRelationshipProperties;
-import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipDataSource;
-import com.erebelo.springstrategydemo.model.enums.relationship.nova.NovaRelationshipLabel;
-import com.erebelo.springstrategydemo.model.enums.relationship.nova.NovaRelationshipStatus;
+import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipAdapterType;
+import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipStatus;
 import com.erebelo.springstrategydemo.repository.MongoRepository;
 import com.erebelo.springstrategydemo.service.adapter.AbstractRelationshipAdapter;
 import com.erebelo.springstrategydemo.util.AdapterUtils;
@@ -53,24 +53,24 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
     }
 
     @Override
-    public RelationshipDataSource getAdapterName() {
-        return RelationshipDataSource.NOVA_SELLING_RELATIONSHIP;
+    public RelationshipAdapterType getAdapterType() {
+        return RelationshipAdapterType.NOVA_SELLING_RELATIONSHIP;
     }
 
     @Override
     public RelationshipNode resolveFromNode(RelationshipNodeRequest fromNode) {
-        validateNodeType(fromNode.getType(), true, getAdapterName());
+        validateNodeType(fromNode.getType(), true, getAdapterType());
         return resolveNode(fromNode);
     }
 
     @Override
     public RelationshipNode resolveToNode(RelationshipNodeRequest toNode) {
-        validateNodeType(toNode.getType(), false, getAdapterName());
+        validateNodeType(toNode.getType(), false, getAdapterType());
         return resolveNode(toNode);
     }
 
     private RelationshipNode resolveNode(RelationshipNodeRequest nodeRequest) {
-        log.debug("[{}] Resolving node. type={}, identifier={}", getAdapterName(), nodeRequest.getType(),
+        log.debug("[{}] Resolving node. type={}, identifier={}", getAdapterType(), nodeRequest.getType(),
                 nodeRequest.getIdentifier());
 
         Contract contract = mongoRepository.findOneByField("referenceId", nodeRequest.getIdentifier(), Contract.class,
@@ -86,7 +86,7 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
 
     @Override
     public <P> RelationshipProperties resolveRelationshipProperties(P properties) {
-        log.debug("[{}] Resolving relationship properties.", getAdapterName());
+        log.debug("[{}] Resolving relationship properties.", getAdapterType());
 
         NovaSellingRelationshipPropertiesRequest novaRelPropertiesRequest = (NovaSellingRelationshipPropertiesRequest) properties;
 
@@ -97,15 +97,15 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
 
     @Override
     public <P> void enrichRelationshipProperties(P properties) {
-        log.debug("[{}] Enriching relationship properties.", getAdapterName());
+        log.debug("[{}] Enriching relationship properties.", getAdapterType());
 
         NovaSellingRelationshipProperties novaRelProperties = (NovaSellingRelationshipProperties) properties;
-        novaRelProperties.setRelationshipStatus(NovaRelationshipStatus.EXPIRED);
+        novaRelProperties.setRelationshipStatus(RelationshipStatus.EXPIRED);
     }
 
     @Override
     public void enrichRelationshipNodeProperties(List<Relationship> relationships) {
-        log.debug("[{}] Enriching relationship node properties.", getAdapterName());
+        log.debug("[{}] Enriching relationship node properties.", getAdapterType());
 
         Set<String> nodeIdentifiers = relationships.stream().flatMap(
                 relationship -> Stream.of(relationship.getFrom().getIdentifier(), relationship.getTo().getIdentifier()))
@@ -125,8 +125,9 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
     }
 
     @Override
-    public <P> void customSearchCriteria(RelationshipSearchRequest<P> request, Criteria criteria) {
-        log.debug("[{}] Customizing search criteria.", getAdapterName());
+    public <P extends RelationshipPropertiesSearchRequest> void customSearchCriteria(
+            RelationshipSearchRequest<P> request, Criteria criteria) {
+        log.debug("[{}] Customizing search criteria.", getAdapterType());
 
         AdapterUtils.addIfPresent(criteria, "from.type",
                 () -> AdapterUtils.mapIfNoNull(request.getFrom(), RelationshipNodeSearchRequest::getType));
@@ -137,14 +138,10 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
         AdapterUtils.addIfPresent(criteria, "to.identifier",
                 () -> AdapterUtils.mapIfNoNull(request.getTo(), RelationshipNodeSearchRequest::getIdentifier));
 
-        criteria.and("properties.relationshipLabel").is(NovaRelationshipLabel.SELLING_RELATIONSHIP);
-
         NovaNonSellingRelationshipPropertiesSearchRequest novaRelPropertiesSearchRequest = (NovaNonSellingRelationshipPropertiesSearchRequest) request
                 .getProperties();
 
         if (novaRelPropertiesSearchRequest != null) {
-            AdapterUtils.addIfPresent(criteria, "properties.relationshipStatus",
-                    novaRelPropertiesSearchRequest::getRelationshipStatus);
             AdapterUtils.addIfPresent(criteria, "properties.relationshipType",
                     novaRelPropertiesSearchRequest::getRelationshipType);
         }

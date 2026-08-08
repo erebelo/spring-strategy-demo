@@ -1,6 +1,7 @@
 package com.erebelo.springstrategydemo.model.entity.relationship;
 
 import com.erebelo.springstrategydemo.model.entity.BaseEntity;
+import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipAdapterType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.Valid;
@@ -46,5 +47,8 @@ public class Relationship extends BaseEntity {
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate endDate;
+
+    @NotNull
+    private RelationshipAdapterType adapterType;
 
 }

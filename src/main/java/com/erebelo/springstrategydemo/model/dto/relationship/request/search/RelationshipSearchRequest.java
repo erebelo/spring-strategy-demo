@@ -1,6 +1,6 @@
 package com.erebelo.springstrategydemo.model.dto.relationship.request.search;
 
-import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipDataSource;
+import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipAdapterType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.Valid;
@@ -22,10 +22,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RelationshipSearchRequest<P> {
-
-    @NotNull
-    private RelationshipDataSource relationshipDataSource;
+public class RelationshipSearchRequest<P extends RelationshipPropertiesSearchRequest> {
 
     @Valid
     private RelationshipNodeSearchRequest from;
@@ -41,5 +38,8 @@ public class RelationshipSearchRequest<P> {
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate endDate;
+
+    @NotNull
+    private RelationshipAdapterType adapterType;
 
 }

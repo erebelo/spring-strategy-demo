@@ -1,26 +1,26 @@
-package com.erebelo.springstrategydemo.model.entity.relationship.nova;
+package com.erebelo.springstrategydemo.model.dto.relationship.request;
 
-import com.erebelo.springstrategydemo.model.entity.relationship.RelationshipProperties;
-import com.erebelo.springstrategydemo.model.enums.relationship.nova.NovaSellingRelationshipType;
+import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+/*
+ * Polymorphic base class for RelationshipRequest properties.
+ */
 @Data
 @SuperBuilder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class NovaSellingRelationshipProperties extends RelationshipProperties {
+public abstract class RelationshipPropertiesRequest {
 
     @NotNull
-    private NovaSellingRelationshipType relationshipType;
+    private RelationshipStatus relationshipStatus;
 
 }

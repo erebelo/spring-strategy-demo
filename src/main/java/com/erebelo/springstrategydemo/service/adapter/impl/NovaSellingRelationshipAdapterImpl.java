@@ -70,14 +70,14 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
     }
 
     private RelationshipNode resolveNode(RelationshipNodeRequest nodeRequest) {
-        log.debug("[{}] Resolving node for type={}, identifier={}", getAdapterName(), nodeRequest.getType(),
+        log.debug("[{}] Resolving node. type={}, identifier={}", getAdapterName(), nodeRequest.getType(),
                 nodeRequest.getIdentifier());
 
         Contract contract = mongoRepository.findOneByField("referenceId", nodeRequest.getIdentifier(), Contract.class,
                 CONTRACT_FIELDS);
 
         if (contract == null) {
-            throw new NotFoundException("Node not found for type=%s, identifier=%s".formatted(nodeRequest.getType(),
+            throw new NotFoundException("Node not found. type=%s, identifier=%s".formatted(nodeRequest.getType(),
                     nodeRequest.getIdentifier()));
         }
 
@@ -86,7 +86,7 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
 
     @Override
     public <P> RelationshipProperties resolveRelationshipProperties(P properties) {
-        log.debug("[{}] Resolving relationship properties", getAdapterName());
+        log.debug("[{}] Resolving relationship properties.", getAdapterName());
 
         NovaSellingRelationshipPropertiesRequest novaRelPropertiesRequest = (NovaSellingRelationshipPropertiesRequest) properties;
 
@@ -97,7 +97,7 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
 
     @Override
     public <P> void enrichRelationshipProperties(P properties) {
-        log.debug("[{}] Enriching relationship properties", getAdapterName());
+        log.debug("[{}] Enriching relationship properties.", getAdapterName());
 
         NovaSellingRelationshipProperties novaRelProperties = (NovaSellingRelationshipProperties) properties;
         novaRelProperties.setRelationshipStatus(NovaRelationshipStatus.EXPIRED);
@@ -105,7 +105,7 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
 
     @Override
     public void enrichRelationshipNodeProperties(List<Relationship> relationships) {
-        log.debug("[{}] Enriching relationship node properties", getAdapterName());
+        log.debug("[{}] Enriching relationship node properties.", getAdapterName());
 
         Set<String> nodeIdentifiers = relationships.stream().flatMap(
                 relationship -> Stream.of(relationship.getFrom().getIdentifier(), relationship.getTo().getIdentifier()))
@@ -126,7 +126,7 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
 
     @Override
     public <P> void customSearchCriteria(RelationshipSearchRequest<P> request, Criteria criteria) {
-        log.debug("[{}] Customizing search criteria", getAdapterName());
+        log.debug("[{}] Customizing search criteria.", getAdapterName());
 
         AdapterUtils.addIfPresent(criteria, "from.type",
                 () -> AdapterUtils.mapIfNoNull(request.getFrom(), RelationshipNodeSearchRequest::getType));

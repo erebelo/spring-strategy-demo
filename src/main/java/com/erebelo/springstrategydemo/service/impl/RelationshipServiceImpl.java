@@ -51,14 +51,15 @@ public class RelationshipServiceImpl implements RelationshipService {
         this.objectMapper = objectMapper;
         this.deepObjectComparator = deepObjectComparator;
 
-        log.info("Initialized RelationshipServiceV2 with {} adapters: {}", adapters.size(), adapters.keySet());
+        log.info("Initialized RelationshipServiceV2 with {} adapters. adapterNames={}", adapters.size(),
+                adapters.keySet());
     }
 
     @Transactional
-    public <P> RelationshipResponse upsertRelationship(RelationshipDataSource adapterName,
-            RelationshipRequest<P> request) {
-        log.info("[{}] Upserting relationship: {} <-> {}", adapterName, request.getFrom().getIdentifier(),
-                request.getTo().getIdentifier());
+    public <P> RelationshipResponse upsertRelationship(RelationshipRequest<P> request) {
+        RelationshipDataSource adapterName = request.getRelationshipDataSource();
+        log.info("[{}] Upserting relationship. from.identifier={}, to.identifier{}", adapterName,
+                request.getFrom().getIdentifier(), request.getTo().getIdentifier());
 
         RelationshipAdapter adapter = getAdapter(adapterName);
 
@@ -75,7 +76,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         Relationship relationship;
 
         if (existingRelationship != null) {
-            log.info("[{}] Found existing relationship, updating with ID={}", adapterName,
+            log.info("[{}] Found existing relationship, updating with ID={}.", adapterName,
                     existingRelationship.getId());
 
             JsonNode originalRelationship = deepObjectComparator.toTypedTree(existingRelationship);
@@ -91,29 +92,29 @@ public class RelationshipServiceImpl implements RelationshipService {
                     deepObjectComparator.toTypedTree(relationship))) {
                 mongoRepository.save(relationship);
 
-                log.info("[{}] Successfully updated relationship with ID={}", adapterName, relationship.getId());
+                log.info("[{}] Successfully updated relationship with ID={}.", adapterName, relationship.getId());
             } else {
-                log.info("[{}] No changes detected for relationship with ID={}", adapterName, relationship.getId());
+                log.info("[{}] No changes detected for relationship with ID={}.", adapterName, relationship.getId());
             }
         } else {
-            log.info("[{}] No existing relationship found, creating new one", adapterName);
+            log.info("[{}] No existing relationship found, creating new one.", adapterName);
 
             relationship = Relationship.builder().from(fromNode).to(toNode).properties(properties)
                     .startDate(request.getStartDate()).endDate(request.getEndDate()).build();
 
             mongoRepository.insert(relationship);
 
-            log.info("[{}] Successfully inserted relationship with ID={}", adapterName, relationship.getId());
+            log.info("[{}] Successfully inserted relationship with ID={}.", adapterName, relationship.getId());
         }
 
         return relationshipMapper.toRelationshipResponse(relationship, objectMapper);
     }
 
     @Transactional
-    public <P> RelationshipResponse expireRelationship(RelationshipDataSource adapterName,
-            RelationshipExpireRequest<P> request) {
-        log.info("[{}] Expiring relationship: {} <-> {}", adapterName, request.getFrom().getIdentifier(),
-                request.getTo().getIdentifier());
+    public <P> RelationshipResponse expireRelationship(RelationshipExpireRequest<P> request) {
+        RelationshipDataSource adapterName = request.getRelationshipDataSource();
+        log.info("[{}] Expiring relationship. from.identifier={}, to.identifier{}", adapterName,
+                request.getFrom().getIdentifier(), request.getTo().getIdentifier());
 
         RelationshipAdapter adapter = getAdapter(adapterName);
 
@@ -124,7 +125,7 @@ public class RelationshipServiceImpl implements RelationshipService {
 
         if (relationship == null) {
             throw new NotFoundException(
-                    "[%s] No relationship found to expire by matching criteria".formatted(adapterName));
+                    "[%s] No relationship found to expire by matching criteria.".formatted(adapterName));
         }
 
         adapter.enrichRelationshipProperties(relationship.getProperties());
@@ -133,14 +134,14 @@ public class RelationshipServiceImpl implements RelationshipService {
         mongoRepository.save(relationship);
         adapter.enrichRelationshipNodeProperties(List.of(relationship));
 
-        log.info("[{}] Successfully expired relationship with ID={}", adapterName, relationship.getId());
+        log.info("[{}] Successfully expired relationship with ID={}.", adapterName, relationship.getId());
 
         return relationshipMapper.toRelationshipResponse(relationship, objectMapper);
     }
 
     @Transactional
-    public RelationshipResponse expireRelationshipById(RelationshipDataSource adapterName, String relationshipId) {
-        log.info("[{}] Expiring relationship by ID={}", adapterName, relationshipId);
+    public RelationshipResponse expireRelationshipById(String relationshipId, RelationshipDataSource adapterName) {
+        log.info("[{}] Expiring relationship by ID={}.", adapterName, relationshipId);
 
         RelationshipAdapter adapter = getAdapter(adapterName);
 
@@ -150,7 +151,7 @@ public class RelationshipServiceImpl implements RelationshipService {
 
         if (relationship == null) {
             throw new NotFoundException(
-                    "[%s] No active relationship found with ID=%s".formatted(adapterName, relationshipId));
+                    "[%s] No active relationship found with ID=%s.".formatted(adapterName, relationshipId));
         }
 
         adapter.enrichRelationshipProperties(relationship.getProperties());
@@ -159,16 +160,17 @@ public class RelationshipServiceImpl implements RelationshipService {
         mongoRepository.save(relationship);
         adapter.enrichRelationshipNodeProperties(List.of(relationship));
 
-        log.info("[{}] Successfully expired relationship by ID={}", adapterName, relationship.getId());
+        log.info("[{}] Successfully expired relationship by ID={}.", adapterName, relationship.getId());
 
         return relationshipMapper.toRelationshipResponse(relationship, objectMapper);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public <P> Page<@NonNull RelationshipResponse> searchRelationships(RelationshipDataSource adapterName,
-            RelationshipSearchRequest<P> request, Pageable pageable) {
-        log.info("[{}] Fetching relationships with search criteria", adapterName);
+    public <P> Page<@NonNull RelationshipResponse> searchRelationships(RelationshipSearchRequest<P> request,
+            Pageable pageable) {
+        RelationshipDataSource adapterName = request.getRelationshipDataSource();
+        log.info("[{}] Fetching relationships with search criteria.", adapterName);
 
         RelationshipAdapter adapter = getAdapter(adapterName);
 
@@ -183,7 +185,7 @@ public class RelationshipServiceImpl implements RelationshipService {
             adapter.enrichRelationshipNodeProperties(relationships);
         }
 
-        log.info("[{}] Found {} relationships", adapterName, relationshipPage.getTotalElements());
+        log.info("[{}] Found {} relationships.", adapterName, relationshipPage.getTotalElements());
 
         return relationshipPage
                 .map(relationship -> relationshipMapper.toRelationshipResponse(relationship, objectMapper));
@@ -191,6 +193,6 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     private RelationshipAdapter getAdapter(RelationshipDataSource adapterName) {
         return Optional.ofNullable(adapters.get(adapterName)).orElseThrow(() -> new IllegalArgumentException(
-                "Unknown adapter: %s. Available adapters: %s".formatted(adapterName, adapters.keySet())));
+                "Unknown adapter: %s. Available adapters: %s.".formatted(adapterName, adapters.keySet())));
     }
 }

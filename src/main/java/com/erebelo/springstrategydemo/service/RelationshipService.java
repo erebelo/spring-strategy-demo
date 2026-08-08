@@ -11,14 +11,13 @@ import org.springframework.data.domain.Pageable;
 
 public interface RelationshipService {
 
-    <P> RelationshipResponse upsertRelationship(RelationshipDataSource adapterName, RelationshipRequest<P> request);
+    <P> RelationshipResponse upsertRelationship(RelationshipRequest<P> request);
 
-    <P> RelationshipResponse expireRelationship(RelationshipDataSource adapterName,
-            RelationshipExpireRequest<P> request);
+    <P> RelationshipResponse expireRelationship(RelationshipExpireRequest<P> request);
 
-    RelationshipResponse expireRelationshipById(RelationshipDataSource adapterName, String relationshipId);
+    RelationshipResponse expireRelationshipById(String relationshipId, RelationshipDataSource adapterName);
 
-    <P> Page<@NonNull RelationshipResponse> searchRelationships(RelationshipDataSource adapterName,
-            RelationshipSearchRequest<P> request, Pageable pageable);
+    <P> Page<@NonNull RelationshipResponse> searchRelationships(RelationshipSearchRequest<P> request,
+            Pageable pageable);
 
 }

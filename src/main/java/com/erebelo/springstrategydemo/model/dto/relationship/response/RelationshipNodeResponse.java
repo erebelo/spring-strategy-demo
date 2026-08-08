@@ -4,21 +4,8 @@ import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipNodeT
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.Map;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@Builder(toBuilder = true)
-@AllArgsConstructor
-@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class RelationshipNodeResponse {
-
-    private RelationshipNodeType type;
-    private String identifier;
-    private Map<String, Object> properties;
-
+public record RelationshipNodeResponse(RelationshipNodeType type, String identifier, Map<String, Object> properties) {
 }

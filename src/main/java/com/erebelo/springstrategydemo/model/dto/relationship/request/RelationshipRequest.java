@@ -1,8 +1,12 @@
 package com.erebelo.springstrategydemo.model.dto.relationship.request;
 
+import com.erebelo.springstrategydemo.model.dto.relationship.nova.NovaNonSellingRelationshipPropertiesRequest;
+import com.erebelo.springstrategydemo.model.dto.relationship.nova.NovaSellingRelationshipPropertiesRequest;
 import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipAdapterType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -13,6 +17,13 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
+ * Request containing polymorphic relationship properties.
+ *
+ * <p>
+ * The {@code @JsonTypeInfo} and {@code @JsonSubTypes} annotations use
+ * {@code adapterType} as the discriminator to determine the concrete type of
+ * {@code properties} during JSON deserialization.
+ *
  * @param <P>
  *            Type of relationship-specific properties.
  */
@@ -33,6 +44,10 @@ public class RelationshipRequest<P extends RelationshipPropertiesRequest> {
     private RelationshipNodeRequest to;
 
     @Valid
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "adapterType")
+    @JsonSubTypes({
+            @JsonSubTypes.Type(value = NovaSellingRelationshipPropertiesRequest.class, name = RelationshipAdapterType.NOVA_SELLING_RELATIONSHIP_NAME),
+            @JsonSubTypes.Type(value = NovaNonSellingRelationshipPropertiesRequest.class, name = RelationshipAdapterType.NOVA_NON_SELLING_RELATIONSHIP_NAME)})
     private P properties;
 
     @NotNull

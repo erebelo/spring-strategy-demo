@@ -14,7 +14,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * @param <P>
- *            Type of relationship properties
+ *            Type of relationship-specific properties.
  */
 @Data
 @Builder(toBuilder = true)

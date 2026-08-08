@@ -9,8 +9,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-/*
- * Polymorphic base class for Relationship properties.
+/**
+ * Base class for polymorphic, relationship-specific entity properties.
  */
 @Data
 @SuperBuilder(toBuilder = true)

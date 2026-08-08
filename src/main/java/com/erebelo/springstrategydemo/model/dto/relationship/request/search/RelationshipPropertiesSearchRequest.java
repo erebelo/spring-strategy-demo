@@ -8,8 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-/*
- * Polymorphic base class for RelationshipSearchRequest properties.
+/**
+ * Base class for polymorphic, relationship-specific search properties.
  */
 @Data
 @SuperBuilder(toBuilder = true)

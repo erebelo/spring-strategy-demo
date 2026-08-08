@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * @param <P>
- *            Type of relationship properties
+ *            Type of relationship-specific properties.
  */
 @Data
 @Builder(toBuilder = true)

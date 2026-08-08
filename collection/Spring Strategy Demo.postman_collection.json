@@ -1,0 +1,120 @@
+{
+  "info": {
+    "_postman_id": "8a7169ae-5d0a-4e48-9f6c-aafac5bb6034",
+    "name": "Spring Strategy Demo",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "3559566"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "GET Actuator Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/spring-strategy-demo/actuator/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "spring-strategy-demo",
+                "actuator",
+                "health"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Relationships",
+      "item": [
+        {
+          "name": "NOVA Selling Relationships",
+          "item": [
+            {
+              "name": "POST Upsert",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"from\": {\r\n        \"type\": \"CONTRACT_NODE\",\r\n        \"identifier\": \"CTR013\"\r\n    },\r\n    \"to\": {\r\n        \"type\": \"CONTRACT_NODE\",\r\n        \"identifier\": \"CTR012\"\r\n    },\r\n    \"properties\": {\r\n        \"relationshipStatus\": \"ACTIVE\",\r\n        \"relationshipType\": \"ADVISOR_TO_AGENT\"\r\n    },\r\n    \"startDate\": \"2026-08-08\",\r\n    \"adapterType\": \"NOVA_SELLING_RELATIONSHIP\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/spring-strategy-demo/relationships",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "spring-strategy-demo",
+                    "relationships"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "GET Adapter Types",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/spring-strategy-demo/relationships/adapter-types",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "spring-strategy-demo",
+                "relationships",
+                "adapter-types"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": ""
+    }
+  ]
+}

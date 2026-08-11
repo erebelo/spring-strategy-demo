@@ -25,7 +25,7 @@ public class Organization extends BaseEntity {
     private String id;
 
     @NotBlank
-    private String orgRefId;
+    private String referenceId;
 
     @NotBlank
     private String name;

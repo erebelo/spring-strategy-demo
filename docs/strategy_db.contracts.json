@@ -1,0 +1,318 @@
+[{
+  "_id": {
+    "$oid": "692f0bf757f27bbd7a478332"
+  },
+  "referenceId": "CTR001",
+  "profileId": "P001",
+  "role": "Insurer",
+  "businessChannel": "Direct",
+  "productType": "Life Insurance",
+  "status": "Active",
+  "startDate": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "createdBy": "default",
+  "modifiedBy": "default",
+  "createdAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "modifiedAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "version": 0,
+  "_class": "com.erebelo.springnetworkservice.domain.model.Contract"
+},
+{
+  "_id": {
+    "$oid": "692f0bf757f27bbd7a478333"
+  },
+  "referenceId": "CTR002",
+  "profileId": "P002",
+  "role": "Agency",
+  "businessChannel": "Direct",
+  "productType": "Life Insurance",
+  "status": "Active",
+  "startDate": {
+    "$date": "2023-01-01T00:00:00.000Z"
+  },
+  "createdBy": "default",
+  "modifiedBy": "default",
+  "createdAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "modifiedAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "version": 0,
+  "_class": "com.erebelo.springnetworkservice.domain.model.Contract"
+},
+{
+  "_id": {
+    "$oid": "692f0bf757f27bbd7a478334"
+  },
+  "referenceId": "CTR003",
+  "profileId": "P003",
+  "role": "Regional Manager",
+  "businessChannel": "Broker",
+  "productType": "Pension",
+  "status": "Active",
+  "startDate": {
+    "$date": "2023-03-01T00:00:00.000Z"
+  },
+  "createdBy": "default",
+  "modifiedBy": "default",
+  "createdAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "modifiedAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "version": 0,
+  "_class": "com.erebelo.springnetworkservice.domain.model.Contract"
+},
+{
+  "_id": {
+    "$oid": "692f0bf757f27bbd7a478335"
+  },
+  "referenceId": "CTR004",
+  "profileId": "P004",
+  "role": "Regional Manager",
+  "businessChannel": "Broker",
+  "productType": "Investment",
+  "status": "Inactive",
+  "startDate": {
+    "$date": "2023-03-15T00:00:00.000Z"
+  },
+  "endDate": {
+    "$date": "2024-10-31T00:00:00.000Z"
+  },
+  "createdBy": "default",
+  "modifiedBy": "default",
+  "createdAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "modifiedAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "version": 0,
+  "_class": "com.erebelo.springnetworkservice.domain.model.Contract"
+},
+{
+  "_id": {
+    "$oid": "692f0bf757f27bbd7a478336"
+  },
+  "referenceId": "CTR005",
+  "profileId": "P005",
+  "role": "Sub-Agent",
+  "businessChannel": "Broker",
+  "productType": "Life Insurance",
+  "status": "Active",
+  "startDate": {
+    "$date": "2024-11-12T00:00:00.000Z"
+  },
+  "createdBy": "default",
+  "modifiedBy": "default",
+  "createdAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "modifiedAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "version": 0,
+  "_class": "com.erebelo.springnetworkservice.domain.model.Contract"
+},
+{
+  "_id": {
+    "$oid": "692f0bf757f27bbd7a478337"
+  },
+  "referenceId": "CTR006",
+  "profileId": "P006",
+  "role": "Individual",
+  "businessChannel": "Broker",
+  "productType": "Life Insurance",
+  "status": "Active",
+  "startDate": {
+    "$date": "2023-04-01T00:00:00.000Z"
+  },
+  "createdBy": "default",
+  "modifiedBy": "default",
+  "createdAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "modifiedAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "version": 0,
+  "_class": "com.erebelo.springnetworkservice.domain.model.Contract"
+},
+{
+  "_id": {
+    "$oid": "692f0bf757f27bbd7a478338"
+  },
+  "referenceId": "CTR007",
+  "profileId": "P007",
+  "role": "Policy Holder",
+  "businessChannel": "Digital",
+  "productType": "Health Insurance",
+  "status": "Active",
+  "startDate": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "createdBy": "default",
+  "modifiedBy": "default",
+  "createdAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "modifiedAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "version": 0,
+  "_class": "com.erebelo.springnetworkservice.domain.model.Contract"
+},
+{
+  "_id": {
+    "$oid": "692f0bf757f27bbd7a478339"
+  },
+  "referenceId": "CTR008",
+  "profileId": "P008",
+  "role": "Dependent",
+  "businessChannel": "Digital",
+  "productType": "Life Insurance",
+  "status": "Active",
+  "startDate": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "createdBy": "default",
+  "modifiedBy": "default",
+  "createdAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "modifiedAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "version": 0,
+  "_class": "com.erebelo.springnetworkservice.domain.model.Contract"
+},
+{
+  "_id": {
+    "$oid": "692f0bf757f27bbd7a47833a"
+  },
+  "referenceId": "CTR009",
+  "profileId": "P009",
+  "role": "Beneficiary",
+  "businessChannel": "Digital",
+  "productType": "Life Insurance",
+  "status": "Active",
+  "startDate": {
+    "$date": "2024-01-02T00:00:00.000Z"
+  },
+  "createdBy": "default",
+  "modifiedBy": "default",
+  "createdAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "modifiedAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "version": 0,
+  "_class": "com.erebelo.springnetworkservice.domain.model.Contract"
+},
+{
+  "_id": {
+    "$oid": "692f0bf757f27bbd7a47833b"
+  },
+  "referenceId": "CTR010",
+  "profileId": "P010",
+  "role": "Beneficiary",
+  "businessChannel": "Digital",
+  "productType": "Life Insurance",
+  "status": "Inactive",
+  "startDate": {
+    "$date": "2024-01-03T00:00:00.000Z"
+  },
+  "endDate": {
+    "$date": "2024-12-31T00:00:00.000Z"
+  },
+  "createdBy": "default",
+  "modifiedBy": "default",
+  "createdAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "modifiedAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "version": 0,
+  "_class": "com.erebelo.springnetworkservice.domain.model.Contract"
+},
+{
+  "_id": {
+    "$oid": "692f0bf757f27bbd7a47833c"
+  },
+  "referenceId": "CTR011",
+  "profileId": "P011",
+  "role": "Insurer",
+  "businessChannel": "Direct",
+  "productType": "Life Insurance",
+  "status": "Active",
+  "startDate": {
+    "$date": "2024-01-01T00:00:00.000Z"
+  },
+  "createdBy": "default",
+  "modifiedBy": "default",
+  "createdAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "modifiedAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "version": 0,
+  "_class": "com.erebelo.springnetworkservice.domain.model.Contract"
+},
+{
+  "_id": {
+    "$oid": "692f0bf757f27bbd7a47833d"
+  },
+  "referenceId": "CTR012",
+  "profileId": "P012",
+  "role": "Agent",
+  "businessChannel": "Broker",
+  "productType": "Health Insurance",
+  "status": "Active",
+  "startDate": {
+    "$date": "2024-12-01T00:00:00.000Z"
+  },
+  "createdBy": "default",
+  "modifiedBy": "default",
+  "createdAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "modifiedAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "version": 0,
+  "_class": "com.erebelo.springnetworkservice.domain.model.Contract"
+},
+{
+  "_id": {
+    "$oid": "692f0bf757f27bbd7a47833e"
+  },
+  "referenceId": "CTR013",
+  "profileId": "P013",
+  "role": "Advisor",
+  "businessChannel": "Digital",
+  "productType": "Health Insurance",
+  "status": "Active",
+  "startDate": {
+    "$date": "2025-01-01T00:00:00.000Z"
+  },
+  "createdBy": "default",
+  "modifiedBy": "default",
+  "createdAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "modifiedAt": {
+    "$date": "2025-12-12T10:30:57.687Z"
+  },
+  "version": 0,
+  "_class": "com.erebelo.springnetworkservice.domain.model.Contract"
+}]

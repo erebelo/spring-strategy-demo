@@ -22,10 +22,10 @@ To pull the `spring-common-parent` dependency, follow these steps:
 
    Go to your GitHub account -> **Settings** -> **Developer settings** -> **Personal access tokens** -> **Tokens (classic)** -> **Generate new token (
    classic)**:
-    - Fill out the **Note** field: `Pull packages`.
-    - Set the scope:
-        - `read:packages` (to download packages)
-    - Click **Generate token**.
+   - Fill out the **Note** field: `Pull packages`.
+   - Set the scope:
+     - `read:packages` (to download packages)
+   - Click **Generate token**.
 
 2. **Set Up Maven Authentication**:
 
@@ -45,7 +45,47 @@ To pull the `spring-common-parent` dependency, follow these steps:
 
 ## Run App
 
+- Create the required [Database Setup](#database-setup) steps.
+- Complete the required [Import Data](#import-data) steps.
 - Run the `SpringStrategyDemoApplication` class as Java Application.
+
+## Database Setup
+
+Create the `strategy_db` database and the required collections and indexes.
+
+**Create database:**
+
+```javascript
+use strategy_db
+```
+
+**Create collections:**
+
+```javascript
+db.createCollection("contracts");
+db.createCollection("organizations");
+db.createCollection("relationships");
+```
+
+**Create indexes:**
+
+```javascript
+// Ensures contract reference IDs are unique.
+db.contracts.createIndex({ referenceId: 1 }, { unique: true });
+// Improves queries that filter contracts by role.
+db.contracts.createIndex({ role: 1 });
+
+// Ensures organization reference IDs are unique.
+db.organizations.createIndex({ referenceId: 1 }, { unique: true });
+
+// Improves relationship queries by the source and target identifiers.
+db.relationships.createIndex({ "from.identifier": 1 });
+db.relationships.createIndex({ "to.identifier": 1 });
+```
+
+## Import Data
+
+Import the contracts and organizations data into the corresponding collections using the JSON files provided in [/docs](https://github.com/erebelo/spring-strategy-demo/tree/main/docs).
 
 ## Collection
 

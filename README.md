@@ -78,7 +78,7 @@ db.contracts.createIndex({ role: 1 });
 // Ensures organization reference IDs are unique.
 db.organizations.createIndex({ referenceId: 1 }, { unique: true });
 
-// Improves relationship queries by the source and target identifiers.
+// Improves relationship queries by source and target identifiers.
 db.relationships.createIndex({ "from.identifier": 1 });
 db.relationships.createIndex({ "to.identifier": 1 });
 ```

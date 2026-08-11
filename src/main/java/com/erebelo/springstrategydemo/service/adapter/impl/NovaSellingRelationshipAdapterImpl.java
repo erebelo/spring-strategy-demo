@@ -2,7 +2,6 @@ package com.erebelo.springstrategydemo.service.adapter.impl;
 
 import com.erebelo.springstrategydemo.exception.model.NotFoundException;
 import com.erebelo.springstrategydemo.mapper.NovaRelationshipMapper;
-import com.erebelo.springstrategydemo.mapper.RelationshipMapper;
 import com.erebelo.springstrategydemo.model.dto.relationship.nova.NovaNonSellingRelationshipPropertiesSearchRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.nova.NovaSellingRelationshipPropertiesRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.RelationshipNodeRequest;
@@ -36,19 +35,16 @@ import tools.jackson.databind.ObjectMapper;
 public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdapter {
 
     private final MongoRepository mongoRepository;
-    private final RelationshipMapper relationshipMapper;
-    private final NovaRelationshipMapper novaRelationshipMapper;
+    private final NovaRelationshipMapper mapper;
     private final ObjectMapper objectMapper;
 
     private static final String[] CONTRACT_FIELDS = {"role", "productType"};
 
     protected NovaSellingRelationshipAdapterImpl(Validator validator, MongoRepository mongoRepository,
-            RelationshipMapper relationshipMapper, NovaRelationshipMapper novaRelationshipMapper,
-            ObjectMapper objectMapper) {
+            NovaRelationshipMapper mapper, ObjectMapper objectMapper) {
         super(validator);
         this.mongoRepository = mongoRepository;
-        this.relationshipMapper = relationshipMapper;
-        this.novaRelationshipMapper = novaRelationshipMapper;
+        this.mapper = mapper;
         this.objectMapper = objectMapper;
     }
 
@@ -81,7 +77,7 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
                     nodeRequest.getIdentifier()));
         }
 
-        return relationshipMapper.toRelationshipNode(nodeRequest, contract, objectMapper);
+        return mapper.toRelationshipNode(nodeRequest, contract, objectMapper);
     }
 
     @Override
@@ -92,7 +88,7 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
 
         validatePropertiesRequest(novaRelPropertiesRequest);
 
-        return novaRelationshipMapper.toNovaSellingRelationshipProperties(novaRelPropertiesRequest);
+        return mapper.toNovaSellingRelationshipProperties(novaRelPropertiesRequest);
     }
 
     @Override
@@ -116,10 +112,10 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
                 .collect(Collectors.toMap(Contract::getReferenceId, Function.identity()));
 
         for (Relationship relationship : relationships) {
-            relationship.setFrom(relationshipMapper.enrichRelationshipNode(relationship.getFrom(),
+            relationship.setFrom(mapper.enrichRelationshipNode(relationship.getFrom(),
                     contractsByReferenceId.get(relationship.getFrom().getIdentifier()), objectMapper));
 
-            relationship.setTo(relationshipMapper.enrichRelationshipNode(relationship.getTo(),
+            relationship.setTo(mapper.enrichRelationshipNode(relationship.getTo(),
                     contractsByReferenceId.get(relationship.getTo().getIdentifier()), objectMapper));
         }
     }

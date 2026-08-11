@@ -1,66 +1,65 @@
-[{
-  "_id": {
-    "$oid": "692f284657f27bbd7a478356"
+[
+  {
+    "_id": {
+      "$oid": "692f284657f27bbd7a478356"
+    },
+    "referenceId": "ORG001",
+    "name": "Alpha Insurance Corp",
+    "status": "ACTIVE",
+    "startDate": {
+      "$date": "2022-01-10T00:00:00.000Z"
+    },
+    "createdBy": "default",
+    "modifiedBy": "default",
+    "createdAt": {
+      "$date": "2025-12-12T10:30:57.687Z"
+    },
+    "modifiedAt": {
+      "$date": "2025-12-12T10:30:57.687Z"
+    },
+    "version": 0
   },
-  "referenceId": "ORG001",
-  "name": "Alpha Insurance Corp",
-  "status": "Active",
-  "startDate": {
-    "$date": "2022-01-10T00:00:00.000Z"
+  {
+    "_id": {
+      "$oid": "692f284657f27bbd7a478357"
+    },
+    "referenceId": "ORG002",
+    "name": "Beta Financial Group",
+    "status": "INACTIVE",
+    "startDate": {
+      "$date": "2024-05-15T00:00:00.000Z"
+    },
+    "endDate": {
+      "$date": "2025-03-31T00:00:00.000Z"
+    },
+    "createdBy": "default",
+    "modifiedBy": "default",
+    "createdAt": {
+      "$date": "2025-12-12T10:30:57.687Z"
+    },
+    "modifiedAt": {
+      "$date": "2025-12-12T10:30:57.687Z"
+    },
+    "version": 0
   },
-  "createdBy": "default",
-  "modifiedBy": "default",
-  "createdAt": {
-    "$date": "2025-12-12T10:30:57.687Z"
-  },
-  "modifiedAt": {
-    "$date": "2025-12-12T10:30:57.687Z"
-  },
-  "version": 0,
-  "_class": "com.erebelo.springnetworkservice.domain.model.Organization"
-},
-{
-  "_id": {
-    "$oid": "692f284657f27bbd7a478357"
-  },
-  "referenceId": "ORG002",
-  "name": "Beta Financial Group",
-  "status": "Inactive",
-  "startDate": {
-    "$date": "2024-05-15T00:00:00.000Z"
-  },
-  "endDate": {
-    "$date": "2025-03-31T00:00:00.000Z"
-  },
-  "createdBy": "default",
-  "modifiedBy": "default",
-  "createdAt": {
-    "$date": "2025-12-12T10:30:57.687Z"
-  },
-  "modifiedAt": {
-    "$date": "2025-12-12T10:30:57.687Z"
-  },
-  "version": 0,
-  "_class": "com.erebelo.springnetworkservice.domain.model.Organization"
-},
-{
-  "_id": {
-    "$oid": "692f284657f27bbd7a478358"
-  },
-  "referenceId": "ORG003",
-  "name": "Gamma Health Services",
-  "status": "Active",
-  "startDate": {
-    "$date": "2021-09-01T00:00:00.000Z"
-  },
-  "createdBy": "default",
-  "modifiedBy": "default",
-  "createdAt": {
-    "$date": "2025-12-12T10:30:57.687Z"
-  },
-  "modifiedAt": {
-    "$date": "2025-12-12T10:30:57.687Z"
-  },
-  "version": 0,
-  "_class": "com.erebelo.springnetworkservice.domain.model.Organization"
-}]
+  {
+    "_id": {
+      "$oid": "692f284657f27bbd7a478358"
+    },
+    "referenceId": "ORG003",
+    "name": "Gamma Health Services",
+    "status": "ACTIVE",
+    "startDate": {
+      "$date": "2021-09-01T00:00:00.000Z"
+    },
+    "createdBy": "default",
+    "modifiedBy": "default",
+    "createdAt": {
+      "$date": "2025-12-12T10:30:57.687Z"
+    },
+    "modifiedAt": {
+      "$date": "2025-12-12T10:30:57.687Z"
+    },
+    "version": 0
+  }
+]

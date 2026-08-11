@@ -1,5 +1,6 @@
 package com.erebelo.springstrategydemo.repository;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -44,8 +45,13 @@ public class MongoRepository {
         log.debug("Finding {} by {}={} with projections", entityClass.getSimpleName(), fieldName, value);
 
         Query query = new Query(Criteria.where(fieldName).is(value));
+
         for (String field : includeFields) {
             query.fields().include(field);
+        }
+
+        if (!Arrays.asList(includeFields).contains("id")) {
+            query.fields().exclude("_id");
         }
 
         T result = mongoTemplate.findOne(query, entityClass);
@@ -82,6 +88,10 @@ public class MongoRepository {
             query.fields().include(field);
         }
 
+        if (!Arrays.asList(includeFields).contains("id")) {
+            query.fields().exclude("_id");
+        }
+
         List<T> results = mongoTemplate.find(query, entityClass);
 
         log.debug("Found {} {}(s) for {} in {}", results.size(), entityClass.getSimpleName(), fieldName, values);
@@ -104,6 +114,7 @@ public class MongoRepository {
         log.debug("Finding {} by custom criteria", entityClass.getSimpleName());
 
         Query query = new Query(criteria);
+
         T result = mongoTemplate.findOne(query, entityClass);
 
         log.debug("Found {} result with custom criteria: {}", entityClass.getSimpleName(),

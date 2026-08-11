@@ -41,17 +41,16 @@ public class RelationshipServiceImpl implements RelationshipService {
     private final MongoRepository mongoRepository;
     private final RelationshipMapper relationshipMapper;
     private final ObjectMapper objectMapper;
-    private final DeepObjectComparator deepObjectComparator;
+    private final DeepObjectComparator comparator;
 
     public RelationshipServiceImpl(List<RelationshipAdapter> adapterList, MongoRepository mongoRepository,
-            RelationshipMapper relationshipMapper, ObjectMapper objectMapper,
-            DeepObjectComparator deepObjectComparator) {
+            RelationshipMapper relationshipMapper, ObjectMapper objectMapper, DeepObjectComparator comparator) {
         this.adapters = adapterList.stream()
                 .collect(Collectors.toMap(RelationshipAdapter::getAdapterType, Function.identity()));
         this.mongoRepository = mongoRepository;
         this.relationshipMapper = relationshipMapper;
         this.objectMapper = objectMapper;
-        this.deepObjectComparator = deepObjectComparator;
+        this.comparator = comparator;
 
         log.info("Initialized RelationshipServiceV2 with {} adapters. adapterTypes={}", adapters.size(),
                 adapters.keySet());
@@ -61,7 +60,7 @@ public class RelationshipServiceImpl implements RelationshipService {
     public <P extends RelationshipPropertiesRequest> RelationshipResponse upsertRelationship(
             RelationshipRequest<P> request) {
         RelationshipAdapterType adapterType = request.getAdapterType();
-        log.info("[{}] Upserting relationship. from.identifier={}, to.identifier{}", adapterType,
+        log.info("[{}] Upserting relationship. from.identifier={}, to.identifier={}", adapterType,
                 request.getFrom().getIdentifier(), request.getTo().getIdentifier());
 
         RelationshipAdapter adapter = getAdapter(adapterType);
@@ -81,7 +80,7 @@ public class RelationshipServiceImpl implements RelationshipService {
             log.info("[{}] Found existing relationship, updating with ID={}.", adapterType,
                     existingRelationship.getId());
 
-            JsonNode originalRelationship = deepObjectComparator.toTypedTree(existingRelationship);
+            JsonNode original = comparator.toTypedTree(existingRelationship);
 
             relationship = existingRelationship;
             relationship.setFrom(fromNode);
@@ -91,8 +90,7 @@ public class RelationshipServiceImpl implements RelationshipService {
             relationship.setEndDate(request.getEndDate());
             relationship.setAdapterType(request.getAdapterType());
 
-            if (!deepObjectComparator.deepEquals(originalRelationship,
-                    deepObjectComparator.toTypedTree(relationship))) {
+            if (!comparator.deepEquals(original, comparator.toTypedTree(relationship))) {
                 mongoRepository.save(relationship);
 
                 log.info("[{}] Successfully updated relationship with ID={}.", adapterType, relationship.getId());
@@ -117,7 +115,7 @@ public class RelationshipServiceImpl implements RelationshipService {
     @Transactional
     public <P> RelationshipResponse expireRelationship(RelationshipExpireRequest<P> request) {
         RelationshipAdapterType adapterType = request.getAdapterType();
-        log.info("[{}] Expiring relationship. from.identifier={}, to.identifier{}", adapterType,
+        log.info("[{}] Expiring relationship. from.identifier={}, to.identifier={}", adapterType,
                 request.getFrom().getIdentifier(), request.getTo().getIdentifier());
 
         RelationshipAdapter adapter = getAdapter(adapterType);

@@ -1,9 +1,13 @@
 package com.erebelo.springstrategydemo.support;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.data.annotation.Transient;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.MapperConfig;
+import tools.jackson.databind.introspect.AnnotatedMember;
+import tools.jackson.databind.introspect.JacksonAnnotationIntrospector;
+import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ObjectNode;
 
 /**
@@ -11,51 +15,67 @@ import tools.jackson.databind.node.ObjectNode;
  *
  * <pre>
  * Supports:
- * - Deep comparison
- * - Polymorphism (runtime type included)
- * - Any POJO (no annotations required)
+ * - Deep comparison for nested objects and collections.
+ * - Polymorphism (runtime type included).
+ * - Any POJO (no annotations required).
+ * - Spring Data @Transient properties excluded from comparison.
  *
  * Limitations:
- * - Collection order matters (List, Set, Map)
- * - Not suitable for cyclic object graphs
- * - Not intended for security-critical decisions or untrusted input
+ * - Collection order matters (List, Set, Map).
+ * - Not suitable for cyclic object graphs.
+ * - Not intended for security-critical decisions or untrusted input.
  *
  * Comparison semantics:
- * Equality is based on Jackson's serialization view.
- * Fields ignored by Jackson (e.g. transient (Java keyword), @JsonIgnore, etc.)
- * are not included in the comparison.
- * Spring Data @Transient fields will still be serialized and compared.
+ * - Equality is based on Jackson's serialization view.
+ * - Fields ignored by Jackson (e.g. transient (Java keyword), @JsonIgnore, etc.) are not included in the comparison.
+ * - Spring Data @Transient properties are explicitly excluded from comparison.
+ * - Runtime types are included in the comparison.
  * </pre>
  */
 @Component
-@RequiredArgsConstructor
 public class DeepObjectComparator {
 
     private final ObjectMapper mapper;
 
+    public DeepObjectComparator() {
+        this.mapper = JsonMapper.builder().findAndAddModules()
+                .annotationIntrospector(new SpringDataTransientIntrospector()).build();
+    }
+
     /**
      * Compares two objects deeply by converting them to JSON trees.
      */
-    public boolean deepEquals(JsonNode a, JsonNode b) {
-        return a.equals(b);
+    public boolean deepEquals(JsonNode left, JsonNode right) {
+        return left.equals(right);
     }
 
     /**
      * Converts object to JsonNode and injects runtime class to preserve
      * polymorphism.
      */
-    public JsonNode toTypedTree(Object obj) {
-        if (obj == null) {
+    public JsonNode toTypedTree(Object object) {
+        if (object == null) {
             return mapper.nullNode();
         }
 
-        JsonNode tree = mapper.valueToTree(obj);
+        JsonNode tree = mapper.valueToTree(object);
 
         if (tree.isObject()) {
             ObjectNode objNode = (ObjectNode) tree;
-            objNode.put("@class", obj.getClass().getName());
+            objNode.put("@class", object.getClass().getName());
         }
 
         return tree;
+    }
+
+    /**
+     * Makes Spring Data's @Transient behave like a Jackson ignored property for
+     * this comparator only.
+     */
+    private static final class SpringDataTransientIntrospector extends JacksonAnnotationIntrospector {
+        @Override
+        public boolean hasIgnoreMarker(MapperConfig<?> config, AnnotatedMember member) {
+            return member.hasAnnotation(Transient.class) || super.hasIgnoreMarker(config, member);
+        }
     }
 }

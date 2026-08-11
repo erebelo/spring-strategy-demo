@@ -1,9 +1,7 @@
 package com.erebelo.springstrategydemo.mapper;
 
-import com.erebelo.springstrategydemo.model.dto.relationship.request.RelationshipNodeRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.response.RelationshipNodeResponse;
 import com.erebelo.springstrategydemo.model.dto.relationship.response.RelationshipResponse;
-import com.erebelo.springstrategydemo.model.entity.contract.Contract;
 import com.erebelo.springstrategydemo.model.entity.relationship.Relationship;
 import com.erebelo.springstrategydemo.model.entity.relationship.RelationshipNode;
 import java.util.Map;
@@ -18,18 +16,6 @@ import tools.jackson.databind.ObjectMapper;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.WARN)
 public interface RelationshipMapper {
-
-    /*
-     * RelationshipNode mappings.
-     */
-
-    @Mapping(target = "properties", source = "contract", qualifiedByName = "objectToProperties")
-    RelationshipNode toRelationshipNode(RelationshipNodeRequest nodeRequest, Contract contract,
-            @Context ObjectMapper objectMapper);
-
-    @Mapping(target = "properties", source = "contract", qualifiedByName = "objectToProperties")
-    RelationshipNode enrichRelationshipNode(RelationshipNode node, Contract contract,
-            @Context ObjectMapper objectMapper);
 
     /*
      * RelationshipResponse and RelationshipNodeResponse mappings.

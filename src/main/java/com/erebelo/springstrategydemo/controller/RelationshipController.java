@@ -8,6 +8,8 @@ import com.erebelo.springstrategydemo.model.dto.relationship.response.Relationsh
 import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipAdapterType;
 import com.erebelo.springstrategydemo.service.RelationshipService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.EnumSet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/relationships")
 @RequiredArgsConstructor
@@ -53,8 +57,8 @@ public class RelationshipController {
     }
 
     @PostMapping("/{relationshipId}/expire")
-    public RelationshipResponse expireRelationshipById(@PathVariable String relationshipId,
-            @RequestParam RelationshipAdapterType adapterType) {
+    public RelationshipResponse expireRelationshipById(@PathVariable @NotBlank String relationshipId,
+            @RequestParam @NotNull RelationshipAdapterType adapterType) {
         log.info("[{}] Expiring relationship by ID={}.", adapterType, relationshipId);
 
         return service.expireRelationshipById(relationshipId, adapterType);

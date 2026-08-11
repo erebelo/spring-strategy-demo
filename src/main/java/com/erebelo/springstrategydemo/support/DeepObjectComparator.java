@@ -43,15 +43,15 @@ public class DeepObjectComparator {
     }
 
     /**
-     * Compares two objects deeply by converting them to JSON trees.
+     * Compares two JSON trees for deep equality.
      */
     public boolean deepEquals(JsonNode left, JsonNode right) {
         return left.equals(right);
     }
 
     /**
-     * Converts object to JsonNode and injects runtime class to preserve
-     * polymorphism.
+     * Converts an object to a JSON tree and includes its runtime class to preserve
+     * polymorphism during comparison.
      */
     public JsonNode toTypedTree(Object object) {
         if (object == null) {

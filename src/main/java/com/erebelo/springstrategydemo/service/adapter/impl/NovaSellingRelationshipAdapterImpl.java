@@ -22,7 +22,6 @@ import jakarta.validation.Validator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +37,7 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
     private final NovaRelationshipMapper mapper;
     private final ObjectMapper objectMapper;
 
-    private static final String[] CONTRACT_FIELDS = {"role", "productType"};
+    private static final String[] CONTRACT_FIELDS = {"referenceId", "role", "productType"};
 
     protected NovaSellingRelationshipAdapterImpl(Validator validator, MongoRepository mongoRepository,
             NovaRelationshipMapper mapper, ObjectMapper objectMapper) {
@@ -77,6 +76,7 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
                     nodeRequest.getIdentifier()));
         }
 
+        contract.setReferenceId(null); // Wipe field to exclude from object
         return mapper.toRelationshipNode(nodeRequest, contract, objectMapper);
     }
 
@@ -109,7 +109,11 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
 
         Map<String, Contract> contractsByReferenceId = mongoRepository
                 .findAllByField("referenceId", nodeIdentifiers, Contract.class, CONTRACT_FIELDS).stream()
-                .collect(Collectors.toMap(Contract::getReferenceId, Function.identity()));
+                .collect(Collectors.toMap(Contract::getReferenceId, // Use as map key before wiping
+                        contract -> {
+                            contract.setReferenceId(null); // Wipe field to exclude from object
+                            return contract;
+                        }));
 
         for (Relationship relationship : relationships) {
             relationship.setFrom(mapper.enrichRelationshipNode(relationship.getFrom(),

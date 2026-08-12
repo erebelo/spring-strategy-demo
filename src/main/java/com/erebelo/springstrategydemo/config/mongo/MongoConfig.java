@@ -1,5 +1,7 @@
 package com.erebelo.springstrategydemo.config.mongo;
 
+import com.erebelo.springstrategydemo.config.mongo.converter.DocumentEnumReadingConverter;
+import com.erebelo.springstrategydemo.config.mongo.converter.DocumentEnumWritingConverter;
 import com.erebelo.springstrategydemo.config.mongo.converter.LocalDateReadingConverter;
 import com.erebelo.springstrategydemo.config.mongo.converter.LocalDateWritingConverter;
 import java.util.Optional;
@@ -36,14 +38,15 @@ public class MongoConfig {
     }
 
     /**
-     * Registers custom converters for MongoDB to serialize and deserialize
-     * LocalDate values.
+     * Registers custom MongoDB converters for LocalDate and DocumentEnum values.
      */
     @Bean
     MongoCustomConversions customConversions() {
         return MongoCustomConversions.create(adapter -> {
             adapter.registerConverter(new LocalDateWritingConverter());
             adapter.registerConverter(new LocalDateReadingConverter());
+            adapter.registerConverter(new DocumentEnumWritingConverter());
+            adapter.registerConverterFactory(new DocumentEnumReadingConverter());
         });
     }
 }

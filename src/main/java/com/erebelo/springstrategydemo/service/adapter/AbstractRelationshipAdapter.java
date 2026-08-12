@@ -25,16 +25,9 @@ public abstract class AbstractRelationshipAdapter implements RelationshipAdapter
     @Override
     public final Criteria baseIdentityCriteria(RelationshipAdapterType adapterType, RelationshipNodeRequest from,
             RelationshipNodeRequest to) {
-        Criteria criteria = new Criteria();
-
-        criteria.and("from.type").is(from.getType());
-        criteria.and("from.identifier").is(from.getIdentifier());
-        criteria.and("to.type").is(to.getType());
-        criteria.and("to.identifier").is(to.getIdentifier());
-        criteria.and("properties.relationshipStatus").ne(RelationshipStatus.EXPIRED);
-        criteria.and("adapterType").is(adapterType);
-
-        return criteria;
+        return Criteria.where("from.type").is(from.getType()).and("from.identifier").is(from.getIdentifier())
+                .and("to.type").is(to.getType()).and("to.identifier").is(to.getIdentifier())
+                .and("properties.relationshipStatus").ne(RelationshipStatus.EXPIRED).and("adapterType").is(adapterType);
     }
 
     @Override

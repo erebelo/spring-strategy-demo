@@ -1,12 +1,11 @@
 package com.erebelo.springstrategydemo.model.enums.relationship;
 
+import com.erebelo.springstrategydemo.config.mongo.converter.DocumentEnum;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-@Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public enum RelationshipAdapterType {
+public enum RelationshipAdapterType implements DocumentEnum {
 
     NOVA_SELLING_RELATIONSHIP("NOVA", "SELLING_RELATIONSHIP"), NOVA_NON_SELLING_RELATIONSHIP("NOVA",
             "NON_SELLING_RELATIONSHIP");
@@ -16,4 +15,5 @@ public enum RelationshipAdapterType {
 
     public static final String NOVA_SELLING_RELATIONSHIP_NAME = "NOVA_SELLING_RELATIONSHIP";
     public static final String NOVA_NON_SELLING_RELATIONSHIP_NAME = "NOVA_NON_SELLING_RELATIONSHIP";
+
 }

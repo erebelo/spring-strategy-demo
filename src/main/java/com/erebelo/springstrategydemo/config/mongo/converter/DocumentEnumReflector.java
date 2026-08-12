@@ -9,6 +9,17 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.experimental.UtilityClass;
 
+/**
+ * Utility to extract attributes from {@link DocumentEnum} instances via
+ * reflection for MongoDB persistence.
+ * <p>
+ * Caches fields for high performance and filters out static or synthetic
+ * members.
+ * <p>
+ * Note: Returns a {@link LinkedHashMap}, but database queries should target
+ * individual fields (dot notation) to avoid strict BSON field ordering mismatch
+ * issues.
+ */
 @UtilityClass
 class DocumentEnumReflector {
 

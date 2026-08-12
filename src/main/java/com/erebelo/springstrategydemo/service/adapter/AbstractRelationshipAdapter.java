@@ -27,31 +27,27 @@ public abstract class AbstractRelationshipAdapter implements RelationshipAdapter
             RelationshipNodeRequest to) {
         return Criteria.where("from.type").is(from.getType()).and("from.identifier").is(from.getIdentifier())
                 .and("to.type").is(to.getType()).and("to.identifier").is(to.getIdentifier())
-                .and("properties.relationshipStatus").ne(RelationshipStatus.EXPIRED).and("adapterType").is(adapterType);
+                .and("properties.relationshipStatus").ne(RelationshipStatus.EXPIRED).and("adapterType.dataSource")
+                .is(adapterType.getDataSource()).and("adapterType.label").is(adapterType.getLabel());
     }
 
     @Override
     public final Criteria baseByIdCriteria(RelationshipAdapterType adapterType, String id) {
-        Criteria criteria = new Criteria();
-
-        criteria.and("_id").is(id);
-        criteria.and("properties.relationshipStatus").ne(RelationshipStatus.EXPIRED);
-        criteria.and("adapterType").is(adapterType);
-
-        return criteria;
+        return Criteria.where("_id").is(id).and("properties.relationshipStatus").ne(RelationshipStatus.EXPIRED)
+                .and("adapterType.dataSource").is(adapterType.getDataSource()).and("adapterType.label")
+                .is(adapterType.getLabel());
     }
 
     @Override
     public final <P extends RelationshipPropertiesSearchRequest> Criteria baseSearchCriteria(
             RelationshipAdapterType adapterType, RelationshipSearchRequest<P> request) {
-        Criteria criteria = new Criteria();
+        Criteria criteria = Criteria.where("adapterType.dataSource").is(adapterType.getDataSource())
+                .and("adapterType.label").is(adapterType.getLabel());
 
         AdapterUtils.addIfPresent(criteria, "startDate", request::getStartDate);
         AdapterUtils.addIfPresent(criteria, "endDate", request::getEndDate);
         AdapterUtils.addIfPresent(criteria, "properties.relationshipStatus", () -> AdapterUtils
                 .mapIfNoNull(request.getProperties(), RelationshipPropertiesSearchRequest::getRelationshipStatus));
-
-        criteria.and("adapterType").is(adapterType);
 
         return criteria;
     }

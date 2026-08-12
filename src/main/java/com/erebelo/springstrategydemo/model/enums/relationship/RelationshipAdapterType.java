@@ -3,7 +3,9 @@ package com.erebelo.springstrategydemo.model.enums.relationship;
 import com.erebelo.springstrategydemo.config.mongo.converter.DocumentEnum;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum RelationshipAdapterType implements DocumentEnum {
 

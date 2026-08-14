@@ -11,6 +11,8 @@ import com.erebelo.springstrategydemo.util.AdapterUtils;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import org.springframework.data.mongodb.core.query.Criteria;
 
@@ -41,15 +43,17 @@ public abstract class AbstractRelationshipAdapter implements RelationshipAdapter
     @Override
     public final <P extends RelationshipPropertiesSearchRequest> Criteria baseSearchCriteria(
             RelationshipAdapterType adapterType, RelationshipSearchRequest<P> request) {
-        Criteria criteria = Criteria.where("adapterType.dataSource").is(adapterType.getDataSource())
-                .and("adapterType.label").is(adapterType.getLabel());
+        List<Criteria> expressions = new ArrayList<>();
 
-        AdapterUtils.addIfPresent(criteria, "startDate", request::getStartDate);
-        AdapterUtils.addIfPresent(criteria, "endDate", request::getEndDate);
-        AdapterUtils.addIfPresent(criteria, "properties.relationshipStatus", () -> AdapterUtils
-                .mapIfNoNull(request.getProperties(), RelationshipPropertiesSearchRequest::getRelationshipStatus));
+        expressions.add(Criteria.where("adapterType.dataSource").is(adapterType.getDataSource()));
+        expressions.add(Criteria.where("adapterType.label").is(adapterType.getLabel()));
 
-        return criteria;
+        AdapterUtils.addIfPresent(expressions, "startDate", request::getStartDate);
+        AdapterUtils.addIfPresent(expressions, "endDate", request::getEndDate);
+        AdapterUtils.addIfPresent(expressions, "properties.relationshipStatus", () -> AdapterUtils
+                .mapIfNotNull(request.getProperties(), RelationshipPropertiesSearchRequest::getRelationshipStatus));
+
+        return new Criteria().andOperator(expressions.toArray(new Criteria[0]));
     }
 
     protected final void validateNodeType(RelationshipNodeType nodeType, boolean isFromNode,

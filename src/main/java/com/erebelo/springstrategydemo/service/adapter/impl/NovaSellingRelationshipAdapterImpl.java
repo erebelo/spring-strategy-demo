@@ -2,8 +2,8 @@ package com.erebelo.springstrategydemo.service.adapter.impl;
 
 import com.erebelo.springstrategydemo.exception.model.NotFoundException;
 import com.erebelo.springstrategydemo.mapper.NovaRelationshipMapper;
-import com.erebelo.springstrategydemo.model.dto.relationship.nova.NovaNonSellingRelationshipPropertiesSearchRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.nova.NovaSellingRelationshipPropertiesRequest;
+import com.erebelo.springstrategydemo.model.dto.relationship.nova.NovaSellingRelationshipPropertiesSearchRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.RelationshipNodeRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipNodeSearchRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipPropertiesSearchRequest;
@@ -19,6 +19,7 @@ import com.erebelo.springstrategydemo.repository.MongoRepository;
 import com.erebelo.springstrategydemo.service.adapter.AbstractRelationshipAdapter;
 import com.erebelo.springstrategydemo.util.AdapterUtils;
 import jakarta.validation.Validator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -125,25 +126,31 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
     }
 
     @Override
-    public <P extends RelationshipPropertiesSearchRequest> void customSearchCriteria(
+    public <P extends RelationshipPropertiesSearchRequest> Criteria customSearchCriteria(
             RelationshipSearchRequest<P> request, Criteria criteria) {
         log.debug("[{}] Customizing search criteria.", getAdapterType());
 
-        AdapterUtils.addIfPresent(criteria, "from.type",
-                () -> AdapterUtils.mapIfNoNull(request.getFrom(), RelationshipNodeSearchRequest::getType));
-        AdapterUtils.addIfPresent(criteria, "from.identifier",
-                () -> AdapterUtils.mapIfNoNull(request.getFrom(), RelationshipNodeSearchRequest::getIdentifier));
-        AdapterUtils.addIfPresent(criteria, "to.type",
-                () -> AdapterUtils.mapIfNoNull(request.getTo(), RelationshipNodeSearchRequest::getType));
-        AdapterUtils.addIfPresent(criteria, "to.identifier",
-                () -> AdapterUtils.mapIfNoNull(request.getTo(), RelationshipNodeSearchRequest::getIdentifier));
+        List<Criteria> expressions = new ArrayList<>();
 
-        NovaNonSellingRelationshipPropertiesSearchRequest novaRelPropertiesSearchRequest = (NovaNonSellingRelationshipPropertiesSearchRequest) request
-                .getProperties();
+        AdapterUtils.addIfPresent(expressions, "from.type",
+                () -> AdapterUtils.mapIfNotNull(request.getFrom(), RelationshipNodeSearchRequest::getType));
+        AdapterUtils.addIfPresent(expressions, "from.identifier",
+                () -> AdapterUtils.mapIfNotNull(request.getFrom(), RelationshipNodeSearchRequest::getIdentifier));
 
-        if (novaRelPropertiesSearchRequest != null) {
-            AdapterUtils.addIfPresent(criteria, "properties.relationshipType",
-                    novaRelPropertiesSearchRequest::getRelationshipType);
+        AdapterUtils.addIfPresent(expressions, "to.type",
+                () -> AdapterUtils.mapIfNotNull(request.getTo(), RelationshipNodeSearchRequest::getType));
+        AdapterUtils.addIfPresent(expressions, "to.identifier",
+                () -> AdapterUtils.mapIfNotNull(request.getTo(), RelationshipNodeSearchRequest::getIdentifier));
+
+        AdapterUtils.addIfPresent(expressions, "properties.relationshipType",
+                () -> AdapterUtils.mapIfNotNull(
+                        (NovaSellingRelationshipPropertiesSearchRequest) request.getProperties(),
+                        NovaSellingRelationshipPropertiesSearchRequest::getRelationshipType));
+
+        if (expressions.isEmpty()) {
+            return criteria;
         }
+
+        return new Criteria().andOperator(criteria, new Criteria().andOperator(expressions.toArray(new Criteria[0])));
     }
 }

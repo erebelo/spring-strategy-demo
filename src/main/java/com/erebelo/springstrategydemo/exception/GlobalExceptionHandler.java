@@ -23,6 +23,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.exc.InvalidFormatException;
+import tools.jackson.databind.exc.InvalidTypeIdException;
 
 @Slf4j
 @RestControllerAdvice
@@ -59,6 +60,10 @@ public class GlobalExceptionHandler {
 
             message = "Invalid value '%s' for field '%s'. Allowed values: %s.".formatted(
                     invalidFormatException.getValue(), field, getEnumValues(invalidFormatException.getTargetType()));
+        } else if (exception.getCause() instanceof InvalidTypeIdException invalidTypeIdException) {
+            if (exception.getMessage() != null && !exception.getMessage().isBlank()) {
+                message = exception.getMessage();
+            }
         }
 
         return createResponse(HttpStatus.BAD_REQUEST, message);

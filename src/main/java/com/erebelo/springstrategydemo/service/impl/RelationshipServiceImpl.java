@@ -70,7 +70,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         RelationshipProperties properties = adapter.resolveRelationshipProperties(request.getProperties());
 
         Criteria criteria = adapter.baseIdentityCriteria(adapterType, request.getFrom(), request.getTo());
-        adapter.customUpsertCriteria(request, criteria);
+        criteria = adapter.customUpsertCriteria(request, criteria);
 
         Relationship existingRelationship = mongoRepository.findOneByCriteria(criteria, Relationship.class);
 
@@ -121,7 +121,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         RelationshipAdapter adapter = getAdapter(adapterType);
 
         Criteria criteria = adapter.baseIdentityCriteria(adapterType, request.getFrom(), request.getTo());
-        adapter.customExpireCriteria(request, criteria);
+        criteria = adapter.customExpireCriteria(request, criteria);
 
         Relationship relationship = mongoRepository.findOneByCriteria(criteria, Relationship.class);
 
@@ -177,7 +177,7 @@ public class RelationshipServiceImpl implements RelationshipService {
         RelationshipAdapter adapter = getAdapter(adapterType);
 
         Criteria criteria = adapter.baseSearchCriteria(adapterType, request);
-        adapter.customSearchCriteria(request, criteria);
+        criteria = adapter.customSearchCriteria(request, criteria);
 
         Page<@NonNull Relationship> relationshipPage = mongoRepository.findByCriteria(criteria, pageable,
                 Relationship.class);

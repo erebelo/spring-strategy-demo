@@ -47,14 +47,17 @@ public interface RelationshipAdapter {
      * Optional criteria customization.
      */
 
-    default <P extends RelationshipPropertiesRequest> void customUpsertCriteria(RelationshipRequest<P> request,
+    default <P extends RelationshipPropertiesRequest> Criteria customUpsertCriteria(RelationshipRequest<P> request,
             Criteria criteria) {
+        return criteria;
     }
 
-    default <P> void customExpireCriteria(RelationshipExpireRequest<P> request, Criteria criteria) {
+    default <P> Criteria customExpireCriteria(RelationshipExpireRequest<P> request, Criteria criteria) {
+        return criteria;
     }
 
-    default <P extends RelationshipPropertiesSearchRequest> void customSearchCriteria(
+    default <P extends RelationshipPropertiesSearchRequest> Criteria customSearchCriteria(
             RelationshipSearchRequest<P> request, Criteria criteria) {
+        return criteria;
     }
 }

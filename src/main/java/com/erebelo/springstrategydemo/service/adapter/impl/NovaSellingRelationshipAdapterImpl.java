@@ -6,7 +6,6 @@ import com.erebelo.springstrategydemo.model.dto.relationship.nova.NovaSellingRel
 import com.erebelo.springstrategydemo.model.dto.relationship.nova.NovaSellingRelationshipPropertiesSearchRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.RelationshipNodeRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipNodeSearchRequest;
-import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipPropertiesSearchRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipSearchRequest;
 import com.erebelo.springstrategydemo.model.entity.contract.Contract;
 import com.erebelo.springstrategydemo.model.entity.relationship.Relationship;
@@ -126,8 +125,7 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
     }
 
     @Override
-    public <P extends RelationshipPropertiesSearchRequest> Criteria customSearchCriteria(
-            RelationshipSearchRequest<P> request, Criteria criteria) {
+    public <P> Criteria customSearchCriteria(RelationshipSearchRequest<P> request, Criteria criteria) {
         log.debug("[{}] Customizing search criteria.", getAdapterType());
 
         List<Criteria> expressions = new ArrayList<>();
@@ -142,9 +140,14 @@ public class NovaSellingRelationshipAdapterImpl extends AbstractRelationshipAdap
         AdapterUtils.addIfPresent(expressions, "to.identifier",
                 () -> AdapterUtils.mapIfNotNull(request.getTo(), RelationshipNodeSearchRequest::getIdentifier));
 
+        NovaSellingRelationshipPropertiesSearchRequest novaRelPropertiesSearchRequest = (NovaSellingRelationshipPropertiesSearchRequest) request
+                .getProperties();
+
+        AdapterUtils.addIfPresent(expressions, "properties.relationshipStatus",
+                () -> AdapterUtils.mapIfNotNull(novaRelPropertiesSearchRequest,
+                        NovaSellingRelationshipPropertiesSearchRequest::getRelationshipStatus));
         AdapterUtils.addIfPresent(expressions, "properties.relationshipType",
-                () -> AdapterUtils.mapIfNotNull(
-                        (NovaSellingRelationshipPropertiesSearchRequest) request.getProperties(),
+                () -> AdapterUtils.mapIfNotNull(novaRelPropertiesSearchRequest,
                         NovaSellingRelationshipPropertiesSearchRequest::getRelationshipType));
 
         if (expressions.isEmpty()) {

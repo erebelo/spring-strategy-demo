@@ -2,7 +2,6 @@ package com.erebelo.springstrategydemo.service.adapter;
 
 import com.erebelo.springstrategydemo.exception.model.BadRequestException;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.RelationshipNodeRequest;
-import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipPropertiesSearchRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipSearchRequest;
 import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipAdapterType;
 import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipNodeType;
@@ -41,8 +40,8 @@ public abstract class AbstractRelationshipAdapter implements RelationshipAdapter
     }
 
     @Override
-    public final <P extends RelationshipPropertiesSearchRequest> Criteria baseSearchCriteria(
-            RelationshipAdapterType adapterType, RelationshipSearchRequest<P> request) {
+    public final <P> Criteria baseSearchCriteria(RelationshipAdapterType adapterType,
+            RelationshipSearchRequest<P> request) {
         List<Criteria> expressions = new ArrayList<>();
 
         expressions.add(Criteria.where("adapterType.dataSource").is(adapterType.getDataSource()));
@@ -50,8 +49,6 @@ public abstract class AbstractRelationshipAdapter implements RelationshipAdapter
 
         AdapterUtils.addIfPresent(expressions, "startDate", request::getStartDate);
         AdapterUtils.addIfPresent(expressions, "endDate", request::getEndDate);
-        AdapterUtils.addIfPresent(expressions, "properties.relationshipStatus", () -> AdapterUtils
-                .mapIfNotNull(request.getProperties(), RelationshipPropertiesSearchRequest::getRelationshipStatus));
 
         return new Criteria().andOperator(expressions.toArray(new Criteria[0]));
     }

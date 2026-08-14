@@ -1,7 +1,6 @@
 package com.erebelo.springstrategydemo.model.dto.relationship.request.expire;
 
 import com.erebelo.springstrategydemo.model.dto.relationship.request.RelationshipNodeRequest;
-import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipAdapterType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.Valid;
@@ -33,8 +32,5 @@ public class RelationshipExpireRequest<P> {
 
     @Valid
     private P properties;
-
-    @NotNull
-    private RelationshipAdapterType adapterType;
 
 }

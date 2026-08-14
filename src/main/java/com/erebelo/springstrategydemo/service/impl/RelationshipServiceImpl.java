@@ -2,10 +2,8 @@ package com.erebelo.springstrategydemo.service.impl;
 
 import com.erebelo.springstrategydemo.exception.model.NotFoundException;
 import com.erebelo.springstrategydemo.mapper.RelationshipMapper;
-import com.erebelo.springstrategydemo.model.dto.relationship.request.RelationshipPropertiesRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.RelationshipRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.expire.RelationshipExpireRequest;
-import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipPropertiesSearchRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipSearchRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.response.RelationshipResponse;
 import com.erebelo.springstrategydemo.model.entity.relationship.Relationship;
@@ -57,9 +55,8 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     @Transactional
-    public <P extends RelationshipPropertiesRequest> RelationshipResponse upsertRelationship(
+    public <P> RelationshipResponse upsertRelationship(RelationshipAdapterType adapterType,
             RelationshipRequest<P> request) {
-        RelationshipAdapterType adapterType = request.getAdapterType();
         log.info("[{}] Upserting relationship. from.identifier={}, to.identifier={}", adapterType,
                 request.getFrom().getIdentifier(), request.getTo().getIdentifier());
 
@@ -88,7 +85,7 @@ public class RelationshipServiceImpl implements RelationshipService {
             relationship.setProperties(properties);
             relationship.setStartDate(request.getStartDate());
             relationship.setEndDate(request.getEndDate());
-            relationship.setAdapterType(request.getAdapterType());
+            relationship.setAdapterType(adapterType);
 
             if (!comparator.deepEquals(original, comparator.toTypedTree(relationship))) {
                 mongoRepository.save(relationship);
@@ -101,8 +98,7 @@ public class RelationshipServiceImpl implements RelationshipService {
             log.info("[{}] No existing relationship found, creating new one.", adapterType);
 
             relationship = Relationship.builder().from(fromNode).to(toNode).properties(properties)
-                    .startDate(request.getStartDate()).endDate(request.getEndDate())
-                    .adapterType(request.getAdapterType()).build();
+                    .startDate(request.getStartDate()).endDate(request.getEndDate()).adapterType(adapterType).build();
 
             mongoRepository.insert(relationship);
 
@@ -113,8 +109,8 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     @Transactional
-    public <P> RelationshipResponse expireRelationship(RelationshipExpireRequest<P> request) {
-        RelationshipAdapterType adapterType = request.getAdapterType();
+    public <P> RelationshipResponse expireRelationship(RelationshipAdapterType adapterType,
+            RelationshipExpireRequest<P> request) {
         log.info("[{}] Expiring relationship. from.identifier={}, to.identifier={}", adapterType,
                 request.getFrom().getIdentifier(), request.getTo().getIdentifier());
 
@@ -142,7 +138,7 @@ public class RelationshipServiceImpl implements RelationshipService {
     }
 
     @Transactional
-    public RelationshipResponse expireRelationshipById(String relationshipId, RelationshipAdapterType adapterType) {
+    public RelationshipResponse expireRelationshipById(RelationshipAdapterType adapterType, String relationshipId) {
         log.info("[{}] Expiring relationship by ID={}.", adapterType, relationshipId);
 
         RelationshipAdapter adapter = getAdapter(adapterType);
@@ -169,9 +165,8 @@ public class RelationshipServiceImpl implements RelationshipService {
 
     @Override
     @Transactional(readOnly = true)
-    public <P extends RelationshipPropertiesSearchRequest> Page<@NonNull RelationshipResponse> searchRelationships(
+    public <P> Page<@NonNull RelationshipResponse> searchRelationships(RelationshipAdapterType adapterType,
             RelationshipSearchRequest<P> request, Pageable pageable) {
-        RelationshipAdapterType adapterType = request.getAdapterType();
         log.info("[{}] Fetching relationships with search criteria.", adapterType);
 
         RelationshipAdapter adapter = getAdapter(adapterType);

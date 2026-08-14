@@ -1,10 +1,8 @@
 package com.erebelo.springstrategydemo.service.adapter;
 
 import com.erebelo.springstrategydemo.model.dto.relationship.request.RelationshipNodeRequest;
-import com.erebelo.springstrategydemo.model.dto.relationship.request.RelationshipPropertiesRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.RelationshipRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.expire.RelationshipExpireRequest;
-import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipPropertiesSearchRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipSearchRequest;
 import com.erebelo.springstrategydemo.model.entity.relationship.Relationship;
 import com.erebelo.springstrategydemo.model.entity.relationship.RelationshipNode;
@@ -40,15 +38,13 @@ public interface RelationshipAdapter {
 
     Criteria baseByIdCriteria(RelationshipAdapterType adapterType, String id);
 
-    <P extends RelationshipPropertiesSearchRequest> Criteria baseSearchCriteria(RelationshipAdapterType adapterType,
-            RelationshipSearchRequest<P> request);
+    <P> Criteria baseSearchCriteria(RelationshipAdapterType adapterType, RelationshipSearchRequest<P> request);
 
     /*
      * Optional criteria customization.
      */
 
-    default <P extends RelationshipPropertiesRequest> Criteria customUpsertCriteria(RelationshipRequest<P> request,
-            Criteria criteria) {
+    default <P> Criteria customUpsertCriteria(RelationshipRequest<P> request, Criteria criteria) {
         return criteria;
     }
 
@@ -56,8 +52,7 @@ public interface RelationshipAdapter {
         return criteria;
     }
 
-    default <P extends RelationshipPropertiesSearchRequest> Criteria customSearchCriteria(
-            RelationshipSearchRequest<P> request, Criteria criteria) {
+    default <P> Criteria customSearchCriteria(RelationshipSearchRequest<P> request, Criteria criteria) {
         return criteria;
     }
 }

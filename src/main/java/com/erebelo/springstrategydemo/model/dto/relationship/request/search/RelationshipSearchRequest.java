@@ -2,7 +2,6 @@ package com.erebelo.springstrategydemo.model.dto.relationship.request.search;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.validation.Valid;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,13 +21,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RelationshipSearchRequest<P> {
 
-    @Valid
     private RelationshipNodeSearchRequest from;
-
-    @Valid
     private RelationshipNodeSearchRequest to;
-
-    @Valid
     private P properties;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)

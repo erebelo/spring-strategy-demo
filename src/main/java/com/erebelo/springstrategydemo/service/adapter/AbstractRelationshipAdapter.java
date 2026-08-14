@@ -28,15 +28,13 @@ public abstract class AbstractRelationshipAdapter implements RelationshipAdapter
             RelationshipNodeRequest to) {
         return Criteria.where("from.type").is(from.getType()).and("from.identifier").is(from.getIdentifier())
                 .and("to.type").is(to.getType()).and("to.identifier").is(to.getIdentifier())
-                .and("properties.relationshipStatus").ne(RelationshipStatus.EXPIRED).and("adapterType.dataSource")
-                .is(adapterType.getDataSource()).and("adapterType.label").is(adapterType.getLabel());
+                .and("properties.relationshipStatus").ne(RelationshipStatus.EXPIRED).and("adapterType").is(adapterType);
     }
 
     @Override
     public final Criteria baseByIdCriteria(RelationshipAdapterType adapterType, String id) {
         return Criteria.where("_id").is(id).and("properties.relationshipStatus").ne(RelationshipStatus.EXPIRED)
-                .and("adapterType.dataSource").is(adapterType.getDataSource()).and("adapterType.label")
-                .is(adapterType.getLabel());
+                .and("adapterType").is(adapterType);
     }
 
     @Override
@@ -44,8 +42,7 @@ public abstract class AbstractRelationshipAdapter implements RelationshipAdapter
             RelationshipSearchRequest<P> request) {
         List<Criteria> expressions = new ArrayList<>();
 
-        expressions.add(Criteria.where("adapterType.dataSource").is(adapterType.getDataSource()));
-        expressions.add(Criteria.where("adapterType.label").is(adapterType.getLabel()));
+        expressions.add(Criteria.where("adapterType").is(adapterType));
 
         AdapterUtils.addIfPresent(expressions, "startDate", request::getStartDate);
         AdapterUtils.addIfPresent(expressions, "endDate", request::getEndDate);

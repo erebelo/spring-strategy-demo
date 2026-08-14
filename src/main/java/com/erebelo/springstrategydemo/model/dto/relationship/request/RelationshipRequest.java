@@ -32,6 +32,7 @@ public class RelationshipRequest<P> {
     private RelationshipNodeRequest to;
 
     @Valid
+    @NotNull
     private P properties;
 
     @NotNull

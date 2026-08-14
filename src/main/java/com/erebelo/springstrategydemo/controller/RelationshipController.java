@@ -5,6 +5,7 @@ import com.erebelo.springstrategydemo.model.dto.relationship.request.expire.Rela
 import com.erebelo.springstrategydemo.model.dto.relationship.request.search.RelationshipSearchRequest;
 import com.erebelo.springstrategydemo.model.dto.relationship.response.RelationshipAdapterTypeResponse;
 import com.erebelo.springstrategydemo.model.dto.relationship.response.RelationshipResponse;
+import com.erebelo.springstrategydemo.model.dto.response.PageResponse;
 import com.erebelo.springstrategydemo.model.enums.relationship.RelationshipAdapterType;
 import com.erebelo.springstrategydemo.service.RelationshipService;
 import jakarta.validation.Valid;
@@ -14,7 +15,6 @@ import java.util.EnumSet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.validation.annotation.Validated;
@@ -65,10 +65,10 @@ public class RelationshipController {
     }
 
     @PostMapping("/search")
-    public Page<@NonNull RelationshipResponse> searchRelationships(
+    public PageResponse<@NonNull RelationshipResponse> searchRelationships(
             @Valid @RequestBody RelationshipSearchRequest<?> request, @PageableDefault(size = 20) Pageable pageable) {
         log.info("[{}] Searching relationships.", request.getAdapterType());
 
-        return service.searchRelationships(request, pageable);
+        return PageResponse.from(service.searchRelationships(request, pageable));
     }
 }

@@ -28,13 +28,14 @@ public abstract class AbstractRelationshipAdapter implements RelationshipAdapter
             RelationshipNodeRequest to) {
         return Criteria.where("from.type").is(from.getType()).and("from.identifier").is(from.getIdentifier())
                 .and("to.type").is(to.getType()).and("to.identifier").is(to.getIdentifier())
-                .and("properties.relationshipStatus").ne(RelationshipStatus.EXPIRED).and("adapterType").is(adapterType);
+                .and("properties.relationshipStatus").ne(RelationshipStatus.EXPIRED)
+                .andOperator(adapterTypeCriteria(adapterType));
     }
 
     @Override
     public final Criteria baseByIdCriteria(RelationshipAdapterType adapterType, String id) {
         return Criteria.where("_id").is(id).and("properties.relationshipStatus").ne(RelationshipStatus.EXPIRED)
-                .and("adapterType").is(adapterType);
+                .andOperator(adapterTypeCriteria(adapterType));
     }
 
     @Override
@@ -42,12 +43,23 @@ public abstract class AbstractRelationshipAdapter implements RelationshipAdapter
             RelationshipSearchRequest<P> request) {
         List<Criteria> expressions = new ArrayList<>();
 
-        expressions.add(Criteria.where("adapterType").is(adapterType));
+        expressions.add(adapterTypeCriteria(adapterType));
 
         AdapterUtils.addIfPresent(expressions, "startDate", request::getStartDate);
         AdapterUtils.addIfPresent(expressions, "endDate", request::getEndDate);
 
         return new Criteria().andOperator(expressions.toArray(new Criteria[0]));
+    }
+
+    /**
+     * Explicitly matches both dataSource and label to ensure records are retrieved
+     * regardless of the attribute order (dataSource/label or label/dataSource).
+     * Matching only adapterType does not reliably retrieve records when the stored
+     * attribute order differs.
+     */
+    private Criteria adapterTypeCriteria(RelationshipAdapterType adapterType) {
+        return Criteria.where("adapterType.dataSource").is(adapterType.getDataSource()).and("adapterType.label")
+                .is(adapterType.getLabel());
     }
 
     protected final void validateNodeType(RelationshipNodeType nodeType, boolean isFromNode,

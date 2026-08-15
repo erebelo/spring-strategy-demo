@@ -34,7 +34,7 @@
       "name": "Relationships",
       "item": [
         {
-          "name": "NOVA Selling Relationships",
+          "name": "NOVA Selling",
           "item": [
             {
               "name": "POST Upsert",
@@ -43,7 +43,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\r\n    \"from\": {\r\n        \"type\": \"CONTRACT_NODE\",\r\n        \"identifier\": \"CTR013\"\r\n    },\r\n    \"to\": {\r\n        \"type\": \"CONTRACT_NODE\",\r\n        \"identifier\": \"CTR012\"\r\n    },\r\n    \"properties\": {\r\n        \"relationshipStatus\": \"ACTIVE\",\r\n        \"relationshipType\": \"ADVISOR_TO_AGENT\"\r\n    },\r\n    \"startDate\": \"2026-08-08\",\r\n    \"adapterType\": \"NOVA_SELLING_RELATIONSHIP\"\r\n}",
+                  "raw": "{\r\n    \"from\": {\r\n        \"type\": \"CONTRACT_NODE\",\r\n        \"identifier\": \"CTR013\"\r\n    },\r\n    \"to\": {\r\n        \"type\": \"CONTRACT_NODE\",\r\n        \"identifier\": \"CTR012\"\r\n    },\r\n    \"properties\": {\r\n        \"relationshipStatus\": \"ACTIVE\",\r\n        \"relationshipType\": \"ADVISOR_TO_AGENT\"\r\n    },\r\n    \"startDate\": \"2026-08-08\"\r\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -51,38 +51,117 @@
                   }
                 },
                 "url": {
-                  "raw": "{{base_url}}/spring-strategy-demo/relationships",
+                  "raw": "{{base_url}}/spring-strategy-demo/relationships/nova/selling",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
                     "spring-strategy-demo",
-                    "relationships"
+                    "relationships",
+                    "nova",
+                    "selling"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "POST Expire",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"from\": {\r\n        \"type\": \"CONTRACT_NODE\",\r\n        \"identifier\": \"CTR013\"\r\n    },\r\n    \"to\": {\r\n        \"type\": \"CONTRACT_NODE\",\r\n        \"identifier\": \"CTR012\"\r\n    }\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/spring-strategy-demo/relationships/nova/selling/expire",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "spring-strategy-demo",
+                    "relationships",
+                    "nova",
+                    "selling",
+                    "expire"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "POST Expire by Id",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/spring-strategy-demo/relationships/nova/selling/6a7f45cea0930f7dccfdd251/expire",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "spring-strategy-demo",
+                    "relationships",
+                    "nova",
+                    "selling",
+                    "6a7f45cea0930f7dccfdd251",
+                    "expire"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "POST Search",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"from\": {\r\n        \"type\": \"CONTRACT_NODE\",\r\n        \"identifier\": \"CTR013\"\r\n    },\r\n    \"to\": {\r\n        \"type\": \"CONTRACT_NODE\",\r\n        \"identifier\": \"CTR012\"\r\n    },\r\n    \"properties\": {\r\n        \"relationshipStatus\": \"ACTIVE\",\r\n        \"relationshipType\": \"ADVISOR_TO_AGENT\"\r\n    },\r\n    \"startDate\": \"2026-08-08\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/spring-strategy-demo/relationships/nova/selling/search?page=0&size=20&sort=properties.relationshipStatus,asc",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "spring-strategy-demo",
+                    "relationships",
+                    "nova",
+                    "selling",
+                    "search"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "0"
+                    },
+                    {
+                      "key": "size",
+                      "value": "20"
+                    },
+                    {
+                      "key": "sort",
+                      "value": "properties.relationshipStatus,asc"
+                    }
                   ]
                 }
               },
               "response": []
             }
           ]
-        },
-        {
-          "name": "GET Adapter Types",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/spring-strategy-demo/relationships/adapter-types",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "spring-strategy-demo",
-                "relationships",
-                "adapter-types"
-              ]
-            }
-          },
-          "response": []
         }
       ]
     }

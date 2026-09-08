@@ -35,6 +35,10 @@ import tools.jackson.databind.node.ObjectNode;
 @Component
 public class DeepObjectComparator {
 
+    /**
+     * Uses a dedicated ObjectMapper to exclude Spring Data's @Transient properties
+     * without modifying the global ObjectMapper configuration.
+     */
     private final ObjectMapper mapper;
 
     public DeepObjectComparator() {

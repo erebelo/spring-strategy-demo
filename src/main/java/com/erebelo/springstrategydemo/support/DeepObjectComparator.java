@@ -23,7 +23,7 @@ import tools.jackson.databind.node.ObjectNode;
  * Limitations:
  * - Collection order matters (List, Set, Map).
  * - Not suitable for cyclic object graphs.
- * - Not intended for security-critical decisions or untrusted input.
+ * - Equality is based on the configured Jackson serialization view.
  *
  * Comparison semantics:
  * - Equality is based on Jackson's serialization view.
